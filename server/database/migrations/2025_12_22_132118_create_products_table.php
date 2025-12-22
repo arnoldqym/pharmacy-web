@@ -6,11 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
+
     public function up(): void
     {
+        //categories table
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('title')->unique();
+            $table->string('slug')->nullable();
+            $table->string('active')->nullable();
+            $table->timestamps();
+        });
+
+        // products table
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique()->after('id');
