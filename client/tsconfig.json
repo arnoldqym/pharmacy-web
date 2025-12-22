@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    // ... your other options
+    "types": ["vite/client"] // <--- Add this if renaming didn't fix it immediately
+  },
+  "include": ["src"] // <--- Ensures src/vite-env.d.ts is read
+}
