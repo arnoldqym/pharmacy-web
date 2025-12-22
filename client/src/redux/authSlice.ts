@@ -54,7 +54,7 @@ export const logoutUser = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${API_URL}/auth/logout`,
+        `${API_URL}/logout`,
         {},
         {
           headers: {
@@ -62,8 +62,10 @@ export const logoutUser = createAsyncThunk(
           },
         }
       );
-    } catch (error) {
-      console.error("Logout failed on server", error);
+      // Success!
+    } catch (error: any) {
+      // FIX: Actually use 'rejectWithValue' here
+      return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
   }
 );
