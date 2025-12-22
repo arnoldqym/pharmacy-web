@@ -13,8 +13,16 @@ return new class extends Migration
         //categories table
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->unique();
+            $table->string('name')->unique();
             $table->string('slug')->nullable();
+            $table->string('active')->nullable();
+            $table->timestamps();
+        });
+        Schema::create('sub_category', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('caption')->nullable();
+            $table->string('category_id')->nullable();
             $table->string('active')->nullable();
             $table->timestamps();
         });
