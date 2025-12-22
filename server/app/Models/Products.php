@@ -10,13 +10,18 @@ class Products extends Model
 
 protected $table = 'products';
 protected $fillable = [
+        'uuid',
+        'barcode',
         'title',
         'description',
         'selling_price',
         'wholesale_price',
-        'image_url',
-        'stock_quantity',
         'category_id',
+        'sub_category',
+        'mini_category',
+        'image_url',
+        'image_url_2',
+        'stock_quantity',
         'active',
         'meta_title',
         'meta_description',
