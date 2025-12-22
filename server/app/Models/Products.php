@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Models\Catalog;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Products extends Model
 {
-
-protected $table = 'products';
-protected $fillable = [
+    use HasFactory;
+    protected $table = 'products';
+    protected $fillable = [
         'uuid',
         'barcode',
         'title',
@@ -30,7 +31,7 @@ protected $fillable = [
         'updated_at'
     ];
 
-        public function Product()
+    public function Product()
     {
         return $this->belongsTo('App\Models\Product');
     }

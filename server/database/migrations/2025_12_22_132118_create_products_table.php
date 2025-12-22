@@ -48,6 +48,13 @@ return new class extends Migration
             $table->string('meta_keywords');
             $table->timestamps();
         });
+
+        Schema::create('cart', function(Blueprint $table){
+            $table->id();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('product_id')->constrained();
+            $table->integer('quantity')->default(1);
+        });
     }
 
     /**

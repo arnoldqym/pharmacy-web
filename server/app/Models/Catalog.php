@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Models\SubCatalog;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Catalog extends Model
 {
+    use HasFactory;
     protected $table = 'categories';
     protected $fillable = [
         'name',
