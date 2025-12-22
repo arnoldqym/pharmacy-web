@@ -10,32 +10,30 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            // Create a token (assuming you have Sanctum installed)
-            $token = $user->createToken('auth_token')->plainTextToken;
+        // Tell IDE this variable is a JWTGuard
+        /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
+        $guard = Auth::guard('api');
 
-            return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Login successful'
-            ], 200);
+        if (! $token = $guard->attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        return $this->respondWithToken($token, 'Login successful');
     }
 
-    public function signup(Request $request){
+    public function signup(Request $request)
+    {
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed' // Expects password_confirmation field
+            'password' => 'required|string|confirmed'
         ]);
 
         $user = User::create([
@@ -44,18 +42,35 @@ class AuthController extends Controller
             'password' => Hash::make($fields['password']),
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Tell IDE this variable is a JWTGuard
+        /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
+        $guard = Auth::guard('api');
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-            'message' => 'User created successfully'
-        ], 201);
+        $token = $guard->login($user);
+
+        return $this->respondWithToken($token, 'User created successfully', 201);
     }
 
-    public function logout(Request $request){
-        // Revoke the token that was used to authenticate the current request
-        $request->user()->currentAccessToken()->delete();
+    public function logout()
+    {
+        /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
+        $guard = Auth::guard('api');
+        $guard->logout();
+
         return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    protected function respondWithToken($token, $message = null, $status = 200)
+    {
+        /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
+        $guard = Auth::guard('api');
+
+        return response()->json([
+            'user' => $guard->user(),
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => $guard->factory()->getTTL() * 60,
+            'message' => $message
+        ], $status);
     }
 }
