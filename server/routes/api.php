@@ -14,10 +14,10 @@ Route::get('/user', function (Request $request) {
 
 // Authentication routes;
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/signup', [AuthController::class, 'signup']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/signup', [AuthController::class, 'signup']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
 });

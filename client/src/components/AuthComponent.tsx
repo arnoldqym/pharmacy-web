@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+// 1. Import hooks and actions
 import { useDispatch, useSelector } from "react-redux";
-import { authStart, authSuccess, authFailure } from "../redux/authSlice";
+import { loginUser, signupUser } from "../redux/authSlice";
+// Note: In TSX you might need to define RootState type, but for now we skip strict typing
 import {
   Pill,
   Activity,
@@ -12,46 +14,50 @@ import {
 } from "lucide-react";
 
 function AuthComponent() {
-  const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Signup
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.auth);
-  const baseAPIUrl = import.meta.env.VITE_BASE_API_URL;
+  const [isLogin, setIsLogin] = useState(true);
+  const dispatch = useDispatch<any>(); // typed as any for simplicity in JS/TS mix
 
-  // Local form state
+  // 2. Select state from Redux
+  const { loading, error } = useSelector((state: any) => state.auth);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(authStart());
 
-    // Simulate API Call (Replace this with your actual fetch/axios logic)
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        dispatch(
-          authSuccess({ name: formData.name || "User", email: formData.email })
-        );
-        console.log("Logged in successfully");
-      } else {
-        dispatch(authFailure("Invalid credentials"));
-      }
-    }, 2000);
+    if (isLogin) {
+      // 3. Dispatch Login
+      dispatch(
+        loginUser({
+          email: formData.email,
+          password: formData.password,
+        })
+      );
+    } else {
+      // 4. Dispatch Signup
+      dispatch(
+        signupUser({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        })
+      );
+    }
   };
 
   return (
     <div className="min-h-screen w-full flex bg-slate-50">
-      {/* LEFT SIDE: Decorative Pharmacy/Brand Area */}
+      {/* LEFT SIDE: Brand Area (Same as before) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-emerald-600">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-900 opacity-90 z-10" />
-
-        {/* Abstract Background Pattern */}
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-emerald-400 opacity-20 rounded-full blur-2xl animate-pulse" />
 
@@ -64,7 +70,7 @@ function AuthComponent() {
           </h1>
           <p className="text-xl text-emerald-100 max-w-md leading-relaxed">
             Manage your pharmacy inventory, track prescriptions, and handle
-            orders with a secure, professional platform designed for healthcare.
+            orders with a secure, professional platform.
           </p>
         </div>
       </div>
@@ -72,13 +78,7 @@ function AuthComponent() {
       {/* RIGHT SIDE: Form Area */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
-          {/* Header */}
           <div className="text-center mb-10">
-            <div className="flex justify-center mb-4 lg:hidden">
-              <div className="p-3 bg-emerald-100 rounded-xl">
-                <Pill className="text-emerald-600 w-8 h-8" />
-              </div>
-            </div>
             <h2 className="text-3xl font-bold text-slate-800">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
@@ -89,9 +89,7 @@ function AuthComponent() {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name Field (Only for Signup) */}
             {!isLogin && (
               <div className="relative group">
                 <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
@@ -101,11 +99,11 @@ function AuthComponent() {
                   placeholder="Full Name"
                   className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                   onChange={handleChange}
+                  required
                 />
               </div>
             )}
 
-            {/* Email Field */}
             <div className="relative group">
               <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
@@ -114,10 +112,10 @@ function AuthComponent() {
                 placeholder="Email Address"
                 className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 onChange={handleChange}
+                required
               />
             </div>
 
-            {/* Password Field */}
             <div className="relative group">
               <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
@@ -126,17 +124,17 @@ function AuthComponent() {
                 placeholder="Password"
                 className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 onChange={handleChange}
+                required
               />
             </div>
 
-            {/* Error Message */}
+            {/* Error Message Display */}
             {error && (
-              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">
-                {error}
+              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center border border-red-100">
+                {typeof error === "string" ? error : "Authentication failed"}
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               disabled={loading}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-600/30 active:scale-[0.98] flex items-center justify-center gap-2"
@@ -152,12 +150,14 @@ function AuthComponent() {
             </button>
           </form>
 
-          {/* Toggle Login/Signup */}
           <div className="mt-8 text-center">
             <p className="text-slate-500">
               {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  // Clear errors when switching modes
+                }}
                 className="text-emerald-600 font-semibold hover:text-emerald-700 hover:underline transition-all"
               >
                 {isLogin ? "Sign up" : "Log in"}
