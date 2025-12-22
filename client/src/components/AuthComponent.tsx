@@ -15,6 +15,7 @@ function AuthComponent() {
   const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Signup
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
+  const baseAPIUrl = import.meta.env.VITE_BASE_API_URL;
 
   // Local form state
   const [formData, setFormData] = useState({

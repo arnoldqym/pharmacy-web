@@ -12,6 +12,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// Authentication routes
 Route::post('/login', AuthCOntroller::class.'login')->middleware('auth:sanctum') ->name('login');
 Route::post('/signup', AuthCOntroller::class.'signup')->middleware('auth:sanctum') ->name('signup');
 Route::post('/logout', AuthCOntroller::class.'logout')->middleware('auth:sanctum')->name('logout');
