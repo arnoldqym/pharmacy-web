@@ -34,6 +34,6 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/yourusername/pharmacy-project.git](https://github.com/yourusername/pharmacy-project.git)
+   git clone [https://github.com/arnoldqym/pharmacy-project.git](https://github.com/arnoldqym/pharmacy-project.git)
    cd pharmacy-project
    ```
