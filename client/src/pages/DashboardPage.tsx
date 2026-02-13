@@ -8,6 +8,7 @@ import StatsComponent from "../components/dashboard/StatsComponent";
 
 function DashboardPage() {
   const dispatch = useDispatch<AppDispatch>();
+  //const dispatch = useDispatch<any>();
 
   const handleLogout = () => {
     dispatch(logoutUser());
