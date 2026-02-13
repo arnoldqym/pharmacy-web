@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 // Components & Pages
 import AuthComponent from "./components/AuthComponent";
 import LandingPage from "./pages/LandingPage";
-import DashboardLayout from "./pages/DashboardLayout";
+import DashboardPage from "./pages/DashboardPage";
 import Overview from "./pages/Overview";
 import Inventory from "./pages/Inventory";
 import "./App.css";
@@ -42,7 +42,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardLayout />
+              <DashboardPage />
             </ProtectedRoute>
           }
         >
