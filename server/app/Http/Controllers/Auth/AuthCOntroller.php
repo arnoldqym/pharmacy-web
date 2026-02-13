@@ -21,7 +21,7 @@ class AuthController extends Controller
         /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
         $guard = Auth::guard('api');
 
-        if (! $token = $guard->attempt($credentials)) {
+        if (!$token = $guard->attempt($credentials)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 

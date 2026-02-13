@@ -53,21 +53,29 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
+
+      // If there's no token, just resolve immediately
+      if (!token) return;
+
       await axios.post(
         `${API_URL}/logout`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
-      // Success!
     } catch (error: any) {
-      // FIX: Actually use 'rejectWithValue' here
+      // We log the error but don't stop the logout flow
+      console.error(
+        "Server-side logout failed:",
+        error.response?.data?.message,
+      );
       return rejectWithValue(error.response?.data?.message || "Logout failed");
+    } finally {
+      // ALWAYS clear local storage, even if the API call fails
+      localStorage.removeItem("token");
     }
-  }
+  },
 );
 
 // --- SLICE ---
