@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
-
-// Import your components
+import { AppDispatch } from "../redux/store";
+//components
 import DashboardLayout from "../layouts/DashboardLayout";
 import StatsComponent from "../components/dashboard/StatsComponent";
 
 function DashboardPage() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
     dispatch(logoutUser());
