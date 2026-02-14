@@ -1,12 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
+
+// Types definition
+interface Batch {
+  batchNo: string;
+  expiryDate: string;
+  quantity: string;
+}
+
+interface SingleDrugForm {
+  ndc: string;
+  brandName: string;
+  genericName: string;
+  manufacturer: string;
+  dosageForm: string;
+  strength: string;
+  packageSize: string | number;
+  uom: string;
+  costPrice: string | number;
+  sellingPrice: string | number;
+  rxStatus: string;
+  schedule: string;
+  storage: string;
+  minStockLevel: string | number;
+  location: string;
+  batches: Batch[];
+}
+
+interface UploadStatus {
+  type: "success" | "error" | "";
+  message: string;
+}
 
 function UploadsComponent() {
   // Tab state: 'csv' or 'single'
-  const [activeTab, setActiveTab] = useState("csv");
+  const [activeTab, setActiveTab] = useState<"csv" | "single">("csv");
   // CSV file state
-  const [csvFile, setCsvFile] = useState(null);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
   // Single drug form state (including multiple batches)
-  const [singleDrugForm, setSingleDrugForm] = useState({
+  const [singleDrugForm, setSingleDrugForm] = useState<SingleDrugForm>({
     ndc: "",
     brandName: "",
     genericName: "",
@@ -25,28 +56,33 @@ function UploadsComponent() {
     batches: [{ batchNo: "", expiryDate: "", quantity: "" }], // array for multiple batches
   });
   // Upload status messages
-  const [uploadStatus, setUploadStatus] = useState({ type: "", message: "" });
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({
+    type: "",
+    message: "",
+  });
 
   // Handle CSV file selection
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Safely check for files array using optional chaining
+    const file = e.target.files?.[0];
     if (file && file.type !== "text/csv") {
       setUploadStatus({ type: "error", message: "Please select a CSV file." });
       setCsvFile(null);
-    } else {
+    } else if (file) {
       setCsvFile(file);
       setUploadStatus({ type: "", message: "" });
     }
   };
 
   // Simple CSV parser (assumes no commas inside fields, first row headers)
-  const parseCSV = (text) => {
+  const parseCSV = (text: string): Record<string, string>[] => {
     const lines = text.trim().split("\n");
     if (lines.length < 2) return [];
     const headers = lines[0].split(",").map((h) => h.trim());
     return lines.slice(1).map((line) => {
       const values = line.split(",").map((v) => v.trim());
-      const obj = {};
+      // Explicitly type the built object
+      const obj: Record<string, string> = {};
       headers.forEach((header, index) => {
         obj[header] = values[index] || "";
       });
@@ -60,20 +96,29 @@ function UploadsComponent() {
       setUploadStatus({ type: "error", message: "No file selected." });
       return;
     }
+
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (e: ProgressEvent<FileReader>) => {
       try {
-        const csvData = e.target.result;
-        const parsedData = parseCSV(csvData);
-        console.log("Uploaded CSV data:", parsedData);
-        // Here you would typically send parsedData to your API
-        setUploadStatus({
-          type: "success",
-          message: `CSV uploaded successfully. ${parsedData.length} rows processed.`,
-        });
-        setCsvFile(null);
-        // Reset file input
-        document.getElementById("csv-upload").value = "";
+        const csvData = e.target?.result;
+        // Verify we got a string back from the reader
+        if (typeof csvData === "string") {
+          const parsedData = parseCSV(csvData);
+          console.log("Uploaded CSV data:", parsedData);
+          // Here you would typically send parsedData to your API
+
+          setUploadStatus({
+            type: "success",
+            message: `CSV uploaded successfully. ${parsedData.length} rows processed.`,
+          });
+          setCsvFile(null);
+
+          // Cast the DOM element so TS knows it has a .value property
+          const fileInput = document.getElementById(
+            "csv-upload",
+          ) as HTMLInputElement | null;
+          if (fileInput) fileInput.value = "";
+        }
       } catch (error) {
         setUploadStatus({
           type: "error",
@@ -133,13 +178,19 @@ function UploadsComponent() {
   };
 
   // Handle single drug form input changes (for top-level fields)
-  const handleSingleInputChange = (e) => {
+  const handleSingleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setSingleDrugForm((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle batch array changes
-  const handleBatchChange = (index, field, value) => {
+  const handleBatchChange = (
+    index: number,
+    field: keyof Batch,
+    value: string,
+  ) => {
     const updatedBatches = [...singleDrugForm.batches];
     updatedBatches[index][field] = value;
     setSingleDrugForm((prev) => ({ ...prev, batches: updatedBatches }));
@@ -154,7 +205,7 @@ function UploadsComponent() {
   };
 
   // Remove a batch row
-  const removeBatch = (index) => {
+  const removeBatch = (index: number) => {
     if (singleDrugForm.batches.length > 1) {
       const updatedBatches = singleDrugForm.batches.filter(
         (_, i) => i !== index,
@@ -164,10 +215,11 @@ function UploadsComponent() {
   };
 
   // Validate and submit single drug form
-  const handleSingleSubmit = (e) => {
+  const handleSingleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Basic validation: required fields
-    const requiredFields = [
+
+    // Type checking the required fields strictly against the SingleDrugForm interface
+    const requiredFields: Array<keyof SingleDrugForm> = [
       "ndc",
       "brandName",
       "manufacturer",
@@ -176,15 +228,20 @@ function UploadsComponent() {
       "costPrice",
       "sellingPrice",
     ];
-    for (let field of requiredFields) {
+
+    for (const field of requiredFields) {
       if (!singleDrugForm[field]) {
         setUploadStatus({
           type: "error",
-          message: `Please fill in ${field.replace(/([A-Z])/g, " $1").toLowerCase()}.`,
+          message: `Please fill in ${field
+            .toString()
+            .replace(/([A-Z])/g, " $1")
+            .toLowerCase()}.`,
         });
         return;
       }
     }
+
     // Validate at least one batch with required fields
     for (let i = 0; i < singleDrugForm.batches.length; i++) {
       const batch = singleDrugForm.batches[i];
@@ -196,22 +253,22 @@ function UploadsComponent() {
         return;
       }
     }
-    // Construct final object (you may want to transform keys to match API)
+
+    // Construct final object
     const submissionData = {
       ...singleDrugForm,
-      packageSize: parseInt(singleDrugForm.packageSize) || 0,
-      costPrice: parseFloat(singleDrugForm.costPrice) || 0,
-      sellingPrice: parseFloat(singleDrugForm.sellingPrice) || 0,
-      minStockLevel: parseInt(singleDrugForm.minStockLevel) || 0,
+      packageSize: parseInt(singleDrugForm.packageSize as string, 10) || 0,
+      costPrice: parseFloat(singleDrugForm.costPrice as string) || 0,
+      sellingPrice: parseFloat(singleDrugForm.sellingPrice as string) || 0,
+      minStockLevel: parseInt(singleDrugForm.minStockLevel as string, 10) || 0,
       batches: singleDrugForm.batches.map((b) => ({
         ...b,
-        quantity: parseInt(b.quantity) || 0,
+        quantity: parseInt(b.quantity, 10) || 0,
       })),
     };
+
     console.log("Single drug submission:", submissionData);
     setUploadStatus({ type: "success", message: "Drug added successfully!" });
-    // Optionally reset form
-    // setSingleDrugForm({ ...initialFormState });
   };
 
   return (
