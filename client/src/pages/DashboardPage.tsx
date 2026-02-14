@@ -8,7 +8,6 @@ import { Outlet } from "react-router-dom";
 
 function DashboardPage() {
   const dispatch = useDispatch<AppDispatch>();
-  //const dispatch = useDispatch<any>();
 
   const handleLogout = () => {
     dispatch(logoutUser());
