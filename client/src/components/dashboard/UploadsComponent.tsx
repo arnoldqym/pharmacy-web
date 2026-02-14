@@ -1,35 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-
-// Types definition
-interface Batch {
-  batchNo: string;
-  expiryDate: string;
-  quantity: string;
-}
-
-interface SingleDrugForm {
-  ndc: string;
-  brandName: string;
-  genericName: string;
-  manufacturer: string;
-  dosageForm: string;
-  strength: string;
-  packageSize: string | number;
-  uom: string;
-  costPrice: string | number;
-  sellingPrice: string | number;
-  rxStatus: string;
-  schedule: string;
-  storage: string;
-  minStockLevel: string | number;
-  location: string;
-  batches: Batch[];
-}
-
-interface UploadStatus {
-  type: "success" | "error" | "";
-  message: string;
-}
+import type { Batch, SingleDrugForm, UploadStatus } from "../../types/index.dt";
+import axios from "axios";
 
 function UploadsComponent() {
   // Tab state: 'csv' or 'single'
@@ -60,6 +31,8 @@ function UploadsComponent() {
     type: "",
     message: "",
   });
+
+  const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 
   // Handle CSV file selection
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -97,36 +70,21 @@ function UploadsComponent() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      try {
-        const csvData = e.target?.result;
-        // Verify we got a string back from the reader
-        if (typeof csvData === "string") {
-          const parsedData = parseCSV(csvData);
-          console.log("Uploaded CSV data:", parsedData);
-          // Here you would typically send parsedData to your API
-
-          setUploadStatus({
-            type: "success",
-            message: `CSV uploaded successfully. ${parsedData.length} rows processed.`,
-          });
-          setCsvFile(null);
-
-          // Cast the DOM element so TS knows it has a .value property
-          const fileInput = document.getElementById(
-            "csv-upload",
-          ) as HTMLInputElement | null;
-          if (fileInput) fileInput.value = "";
-        }
-      } catch (error) {
-        setUploadStatus({
-          type: "error",
-          message: "Error parsing CSV. Please check the format.",
-        });
-      }
-    };
-    reader.readAsText(csvFile);
+    console.log("Uploading CSV file:", csvFile.name);
+    console.log("token is:", localStorage.getItem("token"));
+    // Api call to upload CSV file
+    const formData = new FormData();
+    formData.append("file", csvFile);
+    axios
+      .post(`${API_BASE_URL}/upload-csv`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Accept: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => console.log("Success:", res.data))
+      .catch((err) => console.error("Error details:", err.response?.data));
   };
 
   // Download sample CSV template
