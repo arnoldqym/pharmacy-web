@@ -12,6 +12,8 @@ import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import StatsComponent from "./components/dashboard/StatsComponent";
 import InventoryComponent from "./components/dashboard/InventoryComponent";
+import OrdersComponent from "./components/dashboard/OrdersComponent";
+import PrescriptionComponent from "./components/dashboard/PrescriptionComponent";
 
 import "./App.css";
 
@@ -53,14 +55,14 @@ function App() {
         >
           {/* Nested routes for dashboard sections can be added here in the future */}
           {/* Default route: matches /dashboard */}
+
           <Route index element={<Navigate to="stats" replace />} />
 
           {/* Nested routes: match /dashboard/... */}
           <Route path="stats" element={<StatsComponent />} />
           <Route path="inventory" element={<InventoryComponent />} />
-          {/* Uncomment when ready: */}
-          {/* <Route path="prescription" element={<PrescriptionComponent />} /> */}
-          {/* <Route path="orders" element={<OrdersComponent />} /> */}
+          <Route path="prescription" element={<PrescriptionComponent />} />
+          <Route path="orders" element={<OrdersComponent />} />
         </Route>
 
         {/* 4. Catch-all (404) */}
