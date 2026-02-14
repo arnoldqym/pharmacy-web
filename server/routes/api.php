@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Upload\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/signup', [AuthController::class, 'signup']);
 
 // 2. Test Route
-Route::get('/test', function(){
+Route::get('/test', function () {
     return response()->json(['message' => 'API is working fine']);
 });
 
@@ -30,4 +31,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::post('/upload-csv', [UploadController::class, 'uploadCSV'])->name('upload.csv');
+    Route::post('/upload-single-drug', [UploadController::class, 'uploadSingleDrug'])->name('upload.single.drug');
 });
