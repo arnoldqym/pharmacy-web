@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   X,
+  Upload,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -142,6 +143,27 @@ function DashboardLayout({
                   }`}
                 />
                 <span>Orders</span>
+              </div>
+            )}
+          </NavLink>
+
+          {/* Uplaod link */}
+          <NavLink to="/dashboard/upload" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <Upload
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Upload Stock</span>
               </div>
             )}
           </NavLink>

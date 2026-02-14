@@ -14,6 +14,7 @@ import StatsComponent from "./components/dashboard/StatsComponent";
 import InventoryComponent from "./components/dashboard/InventoryComponent";
 import OrdersComponent from "./components/dashboard/OrdersComponent";
 import PrescriptionComponent from "./components/dashboard/PrescriptionComponent";
+import UploadsComponent from "./components/dashboard/UploadsComponent";
 
 import "./App.css";
 
@@ -63,6 +64,7 @@ function App() {
           <Route path="inventory" element={<InventoryComponent />} />
           <Route path="prescription" element={<PrescriptionComponent />} />
           <Route path="orders" element={<OrdersComponent />} />
+          <Route path="upload" element={<UploadsComponent />} />
         </Route>
 
         {/* 4. Catch-all (404) */}
