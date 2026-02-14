@@ -7,7 +7,6 @@ import AuthComponent from "./components/AuthComponent";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import Overview from "./pages/Overview";
-import Inventory from "./pages/Inventory";
 import "./App.css";
 
 // Protected Route Wrapper
@@ -47,7 +46,6 @@ function App() {
           }
         >
           <Route index element={<Overview />} />
-          <Route path="inventory" element={<Inventory />} />
         </Route>
 
         {/* 4. Catch-all (404) */}
