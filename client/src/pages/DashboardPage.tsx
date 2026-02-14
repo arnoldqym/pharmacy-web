@@ -5,6 +5,7 @@ import { AppDispatch } from "../redux/store";
 //components
 import DashboardLayout from "../layouts/DashboardLayout";
 import StatsComponent from "../components/dashboard/StatsComponent";
+import InventoryComponent from "../components/dashboard/InventoryComponent";
 
 function DashboardPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,6 +22,7 @@ function DashboardPage() {
       */}
 
       <StatsComponent />
+      <InventoryComponent />
 
       {/* Placeholder for future components */}
       <div className="mt-8 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">

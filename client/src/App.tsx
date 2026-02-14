@@ -3,10 +3,16 @@ import { useSelector } from "react-redux";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Components & Pages
+//login
 import AuthComponent from "./components/AuthComponent";
+//home page
 import LandingPage from "./pages/LandingPage";
+
+//dashboard
 import DashboardPage from "./pages/DashboardPage";
-import Overview from "./pages/Overview";
+import StatsComponent from "./components/dashboard/StatsComponent";
+import InventoryComponent from "./components/dashboard/InventoryComponent";
+
 import "./App.css";
 
 // Protected Route Wrapper
@@ -45,7 +51,16 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Overview />} />
+          {/* Nested routes for dashboard sections can be added here in the future */}
+          {/* Default route: matches /dashboard */}
+          <Route index element={<Navigate to="stats" replace />} />
+
+          {/* Nested routes: match /dashboard/... */}
+          <Route path="stats" element={<StatsComponent />} />
+          <Route path="inventory" element={<InventoryComponent />} />
+          {/* Uncomment when ready: */}
+          {/* <Route path="prescription" element={<PrescriptionComponent />} /> */}
+          {/* <Route path="orders" element={<OrdersComponent />} /> */}
         </Route>
 
         {/* 4. Catch-all (404) */}
