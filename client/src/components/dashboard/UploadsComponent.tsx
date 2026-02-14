@@ -47,22 +47,6 @@ function UploadsComponent() {
     }
   };
 
-  // Simple CSV parser (assumes no commas inside fields, first row headers)
-  const parseCSV = (text: string): Record<string, string>[] => {
-    const lines = text.trim().split("\n");
-    if (lines.length < 2) return [];
-    const headers = lines[0].split(",").map((h) => h.trim());
-    return lines.slice(1).map((line) => {
-      const values = line.split(",").map((v) => v.trim());
-      // Explicitly type the built object
-      const obj: Record<string, string> = {};
-      headers.forEach((header, index) => {
-        obj[header] = values[index] || "";
-      });
-      return obj;
-    });
-  };
-
   // Handle CSV upload
   const handleCsvUpload = () => {
     if (!csvFile) {
@@ -106,6 +90,8 @@ function UploadsComponent() {
       "rx_status",
       "schedule",
       "storage",
+      "location",
+      "min_stock_level",
     ];
     const sampleRow = [
       "12345-678-90",
@@ -124,6 +110,8 @@ function UploadsComponent() {
       "OTC",
       "",
       "Room temperature",
+      "Aisle 3",
+      "50",
     ];
     const csvContent = [headers.join(","), sampleRow.join(",")].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
