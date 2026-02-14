@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { LayoutDashboard, Package, Pill, ClipboardList } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 // 1. Define TypeScript Props
 interface DashboardLayoutProps {
@@ -59,38 +60,61 @@ function DashboardLayout({
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {/* Active Link */}
-          <a
-            href="#"
-            className="flex items-center space-x-3 py-2.5 px-4 bg-green-800 rounded-lg font-medium transition-colors"
+          <NavLink
+            to="/dashboard/stats"
+            className={({ isActive }) =>
+              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                isActive
+                  ? "bg-green-800 text-white"
+                  : "text-gray-300 hover:bg-green-800 hover:text-white"
+              }`
+            }
           >
             <LayoutDashboard size={20} />
             <span>Overview</span>
-          </a>
+          </NavLink>
 
           {/* Inactive Links */}
-          <a
-            href="#"
-            className="flex items-center space-x-3 py-2.5 px-4 hover:bg-green-800 rounded-lg transition-colors text-gray-300 hover:text-white"
+          <NavLink
+            to="/dashboard/inventory"
+            className={({ isActive }) =>
+              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                isActive
+                  ? "bg-green-800 text-white"
+                  : "text-gray-300 hover:bg-green-800 hover:text-white"
+              }`
+            }
           >
             <Package size={20} />
             <span>Inventory</span>
-          </a>
-
-          <a
-            href="#"
-            className="flex items-center space-x-3 py-2.5 px-4 hover:bg-green-800 rounded-lg transition-colors text-gray-300 hover:text-white"
+          </NavLink>
+          <NavLink
+            to="/dashboard/prescription"
+            className={({ isActive }) =>
+              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                isActive
+                  ? "bg-green-800 text-white"
+                  : "text-gray-300 hover:bg-green-800 hover:text-white"
+              }`
+            }
           >
             <Pill size={20} />
             <span>Prescriptions</span>
-          </a>
+          </NavLink>
 
-          <a
-            href="#"
-            className="flex items-center space-x-3 py-2.5 px-4 hover:bg-green-800 rounded-lg transition-colors text-gray-300 hover:text-white"
+          <NavLink
+            to="/dashboard/orders"
+            className={({ isActive }) =>
+              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                isActive
+                  ? "bg-green-800 text-white"
+                  : "text-gray-300 hover:bg-green-800 hover:text-white"
+              }`
+            }
           >
             <ClipboardList size={20} />
             <span>Orders</span>
-          </a>
+          </NavLink>
         </nav>
       </aside>
 
