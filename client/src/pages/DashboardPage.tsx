@@ -17,7 +17,7 @@ function DashboardPage() {
   };
 
   return (
-    <DashboardLayout onLogout={handleLogout} title="Dashboard Overview">
+    <DashboardLayout onLogout={handleLogout} title="Dashboard">
       {/* Everything placed inside DashboardLayout here becomes the {children} 
         prop and is rendered in the main gray area.
       */}

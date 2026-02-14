@@ -1,8 +1,15 @@
-import React, { useState } from "react";
-import { LayoutDashboard, Package, Pill, ClipboardList } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  LayoutDashboard,
+  Package,
+  Pill,
+  ClipboardList,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-// 1. Define TypeScript Props
 interface DashboardLayoutProps {
   children: React.ReactNode;
   onLogout: () => void;
@@ -14,159 +21,167 @@ function DashboardLayout({
   onLogout,
   title = "Dashboard",
 }: DashboardLayoutProps) {
-  // 2. State for mobile sidebar toggle
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
-      {/* Mobile Backdrop Overlay - closes sidebar when clicking outside */}
+      {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black opacity-40 transition-opacity md:hidden"
+          className="fixed inset-0 z-20 bg-black/40 backdrop-blur-sm transition-opacity md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-green-900 text-white flex flex-col shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white/90 backdrop-blur-xl border-r border-gray-200/80 shadow-2xl shadow-gray-400/10 flex flex-col transform transition-all duration-300 ease-out md:relative md:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-green-800">
-          <div className="text-2xl font-bold tracking-wide">
-            Pharma<span className="text-green-400">Care</span>
+        <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200/60">
+          <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+            Pharma<span className="text-gray-800">Care</span>
           </div>
-          {/* Close button for mobile only */}
           <button
-            className="md:hidden text-gray-300 hover:text-white focus:outline-none"
+            className="md:hidden p-1 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
             onClick={() => setIsSidebarOpen(false)}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {/* Active Link */}
-          <NavLink
-            to="/dashboard/stats"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
-                isActive
-                  ? "bg-green-800 text-white"
-                  : "text-gray-300 hover:bg-green-800 hover:text-white"
-              }`
-            }
-          >
-            <LayoutDashboard size={20} />
-            <span>Overview</span>
+        <nav className="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+          {/* Overview Link */}
+          <NavLink to="/dashboard/stats" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <LayoutDashboard
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Overview</span>
+              </div>
+            )}
           </NavLink>
 
-          {/* Inactive Links */}
-          <NavLink
-            to="/dashboard/inventory"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
-                isActive
-                  ? "bg-green-800 text-white"
-                  : "text-gray-300 hover:bg-green-800 hover:text-white"
-              }`
-            }
-          >
-            <Package size={20} />
-            <span>Inventory</span>
-          </NavLink>
-          <NavLink
-            to="/dashboard/prescription"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
-                isActive
-                  ? "bg-green-800 text-white"
-                  : "text-gray-300 hover:bg-green-800 hover:text-white"
-              }`
-            }
-          >
-            <Pill size={20} />
-            <span>Prescriptions</span>
+          {/* Inventory Link */}
+          <NavLink to="/dashboard/inventory" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <Package
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Inventory</span>
+              </div>
+            )}
           </NavLink>
 
-          <NavLink
-            to="/dashboard/orders"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 py-2.5 px-4 rounded-lg font-medium transition-colors ${
-                isActive
-                  ? "bg-green-800 text-white"
-                  : "text-gray-300 hover:bg-green-800 hover:text-white"
-              }`
-            }
-          >
-            <ClipboardList size={20} />
-            <span>Orders</span>
+          {/* Prescriptions Link */}
+          <NavLink to="/dashboard/prescription" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <Pill
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Prescriptions</span>
+              </div>
+            )}
+          </NavLink>
+
+          {/* Orders Link */}
+          <NavLink to="/dashboard/orders" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <ClipboardList
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Orders</span>
+              </div>
+            )}
           </NavLink>
         </nav>
+
+        <div className="p-4 text-xs text-center text-gray-400 border-t border-gray-200/60">
+          v2.0 · modern care
+        </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header */}
-        <header className="sticky top-0 z-10 flex h-16 items-center justify-between bg-white px-4 shadow-sm border-b border-gray-200 sm:px-6 lg:px-8">
-          {/* Left Side: Menu + Title */}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 bg-gray-50">
+        <header className="sticky top-0 z-10 flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 bg-white/80 backdrop-blur-md border-b border-gray-200/80 shadow-sm">
           <div className="flex items-center min-w-0 flex-1">
-            {/* Hamburger Menu Button (Mobile Only) */}
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="inline-flex items-center justify-center p-2 mr-2 -ml-2 text-gray-600 rounded-md hover:bg-gray-100 hover:text-green-900 focus:outline-none md:hidden"
+              className="md:hidden p-2 mr-2 -ml-2 text-gray-600 rounded-lg hover:bg-gray-100 hover:text-emerald-600 transition-colors"
+              aria-label="Open sidebar"
             >
-              <span className="sr-only">Open sidebar</span>
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              <Menu size={20} />
             </button>
-
-            {/* Responsive Title */}
-            <h1 className="text-lg font-bold text-gray-900 truncate sm:text-xl">
+            <h1 className="text-lg font-semibold text-gray-800 truncate sm:text-xl bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
               {title}
             </h1>
           </div>
 
-          {/* Right Side: Actions */}
-          <div className="flex items-center ml-4 flex-shrink-0">
+          <div className="flex items-center gap-3 ml-4 flex-shrink-0">
             <button
               onClick={onLogout}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-800 transition-all shadow-sm whitespace-nowrap sm:px-5"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-teal-500 rounded-xl hover:from-emerald-700 hover:to-teal-600 shadow-md shadow-emerald-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
             >
-              {/* Optional: Icon for mobile if button text is too long */}
+              <LogOut size={16} className="mr-2" />
               <span className="hidden sm:inline">Logout</span>
               <span className="sm:hidden">Exit</span>
             </button>
           </div>
         </header>
 
-        {/* Dynamic Page Content */}
         <main className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
-          {children}
+          <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
     </div>
