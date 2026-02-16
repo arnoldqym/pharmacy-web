@@ -53,32 +53,24 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Shop', href: '/shop' },
+    { name: 'Products', href: '/products' },
     {
-      name: 'Pages',
+      name: 'Others',
       submenu: [
         { name: 'Services', href: '/services' },
         { name: 'FAQs', href: '/faq' },
         { name: 'Testimonials', href: '/testimonials' },
       ],
     },
-    { name: 'Team', href: '/team' },
-    {
-      name: 'Blog',
-      submenu: [
-        { name: 'Grid View', href: '/blog' },
-        { name: 'Single Post', href: '/blog/1' },
-      ],
-    },
+    { name: 'About', href: '/about' },
   ];
 
   return (
     <>
       <header
         className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
-            ? 'top-0 bg-white/80 backdrop-blur-md shadow-sm py-2'
-            : 'top-4 py-4'
+          ? 'top-0 bg-white/80 backdrop-blur-md shadow-sm py-2'
+          : 'top-4 py-4'
           }`}
       >
         <div className="max-w-350 mx-auto px-4 sm:px-6">
@@ -157,55 +149,6 @@ export default function Navbar() {
                 >
                   Contact Us
                 </a>
-
-                {/* Language Selector */}
-                <div className="relative" ref={langRef}>
-                  <button
-                    onClick={() => setIsLangOpen(!isLangOpen)}
-                    className="flex items-center gap-2 text-sm font-medium text-slate-600 bg-teal-50/50 px-3 py-2 rounded-lg hover:bg-teal-100/50 transition-colors border border-teal-100"
-                    aria-expanded={isLangOpen}
-                    aria-haspopup="true"
-                  >
-                    <img
-                      src="/assets/images/header-flag1.png"
-                      alt=""
-                      className="w-5 h-3 object-cover rounded-sm"
-                    />
-                    <span>EN</span>
-                    <ChevronDown
-                      size={14}
-                      className={`transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''
-                        }`}
-                    />
-                  </button>
-
-                  {isLangOpen && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white shadow-xl rounded-lg border border-teal-50 overflow-hidden z-50">
-                      <button
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-xs hover:bg-teal-50 transition-colors text-slate-600"
-                        onClick={() => setIsLangOpen(false)}
-                      >
-                        <img
-                          src="/assets/images/header-flag1.png"
-                          className="w-4"
-                          alt=""
-                        />
-                        EN
-                      </button>
-                      <button
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-xs hover:bg-teal-50 transition-colors text-slate-600"
-                        onClick={() => setIsLangOpen(false)}
-                      >
-                        <img
-                          src="/assets/images/header-flag2.png"
-                          className="w-4"
-                          alt=""
-                        />
-                        USA
-                      </button>
-                    </div>
-                  )}
-                </div>
               </div>
 
               {/* Mobile Menu Button */}
