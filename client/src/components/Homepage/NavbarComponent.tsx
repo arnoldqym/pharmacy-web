@@ -76,21 +76,16 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed w-full z-50 transition-all duration-500 ${
-          isScrolled
+        className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
             ? 'top-0 bg-white/80 backdrop-blur-md shadow-sm py-2'
             : 'top-4 py-4'
-        }`}
+          }`}
       >
         <div className="max-w-350 mx-auto px-4 sm:px-6">
           <nav className="flex items-center justify-between bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-2.5 border border-teal-50 shadow-lg shadow-teal-100/20">
             {/* Logo */}
             <a href="/" className="shrink-0" aria-label="Home">
-              <img
-                src="/assets/images/logo.png"
-                alt="Pharmacy Logo"
-                className="h-10 w-auto"
-              />
+              <div className="text-2xl font-bold bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">Pharma<span className="text-gray-800">Care</span></div>
             </a>
 
             {/* Desktop Navigation */}
@@ -179,9 +174,8 @@ export default function Navbar() {
                     <span>EN</span>
                     <ChevronDown
                       size={14}
-                      className={`transition-transform duration-200 ${
-                        isLangOpen ? 'rotate-180' : ''
-                      }`}
+                      className={`transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''
+                        }`}
                     />
                   </button>
 
@@ -241,9 +235,8 @@ export default function Navbar() {
       {/* Mobile Sidebar */}
       <div
         ref={mobileMenuRef}
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         <div className="flex flex-col h-full pt-20 pb-6 px-6">
           <div className="flex-1 space-y-1">
