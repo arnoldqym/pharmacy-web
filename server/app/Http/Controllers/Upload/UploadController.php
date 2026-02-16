@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Upload;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\Drug;
 use App\Models\Batch;
 use Illuminate\Http\Request;
@@ -148,7 +149,7 @@ class UploadController extends Controller
             'manufacturer' => 'nullable|string|max:255',
             // ... rest of your rules
             'batch_no' => 'required|string|max:100',
-            'expiry_date' => 'required|date_format:Y-m-d',
+            'expiry_date' => 'required',
             'quantity' => 'required|integer|min:0',
             'cost_price' => 'required|numeric|min:0',
         ];
@@ -157,22 +158,31 @@ class UploadController extends Controller
     private function processDrugRow(array $data): void
     {
         DB::transaction(function () use ($data) {
+            try {
+                // Carbon::parse is smarter than createFromFormat
+                // It will handle Y-m-d, m/d/Y, and d-m-Y automatically
+                $formattedExpiry = Carbon::parse($data['expiry_date'])->format('Y-m-d');
+            } catch (\Exception $e) {
+                Log::error("Date parsing failed for NDC {$data['ndc']}: " . $data['expiry_date']);
+                throw new \Exception("Invalid date format: {$data['expiry_date']}. Please use YYYY-MM-DD or MM/DD/YYYY.");
+            }
+
             $drug = Drug::updateOrCreate(
                 ['ndc' => $data['ndc']],
                 [
                     'brand_name' => $data['brand_name'],
                     'generic_name' => $data['generic_name'] ?? null,
-                    'manufacturer' => $data['manufacturer'] ?? null,
+                    'manufacturer' => $data['manufacturer'] ?? 'Unknown', // Added fallback
                     'dosage_form' => $data['dosage_form'] ?? null,
-                    'strength' => $data['strength'] ?? null,
-                    'package_size' => $data['package_size'] ?? null,
-                    'uom' => $data['uom'] ?? null,
-                    'selling_price' => $data['selling_price'] ?? null,
-                    'rx_status' => $data['rx_status'] ?? null,
+                    'strength' => $data['strength'] ?? 'N/A',
+                    'package_size' => $data['package_size'] ?? 0,
+                    'uom' => $data['uom'] ?? 'units',
+                    'selling_price' => $data['selling_price'] ?? 0,
+                    'rx_status' => $data['rx_status'] ?? 'Rx',
                     'schedule' => $data['schedule'] ?? null,
                     'storage' => $data['storage'] ?? null,
+                    'min_stock_level' => $data['min_stock_level'] ?? 0,
                     'location' => $data['location'] ?? null,
-                    'min_stock_level' => $data['min_stock_level'] ?? null,
                 ]
             );
 
@@ -182,7 +192,7 @@ class UploadController extends Controller
                     'batch_no' => $data['batch_no'],
                 ],
                 [
-                    'expiry_date' => $data['expiry_date'],
+                    'expiry_date' => $formattedExpiry,
                     'quantity' => $data['quantity'],
                     'cost_price' => $data['cost_price'],
                 ]
