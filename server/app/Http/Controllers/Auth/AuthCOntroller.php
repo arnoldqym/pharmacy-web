@@ -21,7 +21,7 @@ class AuthController extends Controller
         /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
         $guard = Auth::guard('api');
 
-        if (! $token = $guard->attempt($credentials)) {
+        if (!$token = $guard->attempt($credentials)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
@@ -65,12 +65,16 @@ class AuthController extends Controller
         /** @var \PHPOpenSourceSaver\JWTAuth\JWTGuard $guard */
         $guard = Auth::guard('api');
 
+        // Set TTL to 1440 minutes (1 day)
+        $guard->factory()->setTTL(1440);
+
         return response()->json([
             'user' => $guard->user(),
             'token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => $guard->factory()->getTTL() * 60,
+            'expires_in' => $guard->factory()->getTTL() * 60, // seconds
             'message' => $message
         ], $status);
     }
+
 }

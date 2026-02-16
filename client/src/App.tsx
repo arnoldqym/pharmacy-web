@@ -3,11 +3,19 @@ import { useSelector } from "react-redux";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Components & Pages
+//login
 import AuthComponent from "./components/AuthComponent";
+//home page
 import LandingPage from "./pages/LandingPage";
-import DashboardLayout from "./pages/DashboardLayout";
-import Overview from "./pages/Overview";
-import Inventory from "./pages/Inventory";
+
+//dashboard
+import DashboardPage from "./pages/DashboardPage";
+import StatsComponent from "./components/dashboard/StatsComponent";
+import InventoryComponent from "./components/dashboard/InventoryComponent";
+import OrdersComponent from "./components/dashboard/OrdersComponent";
+import PrescriptionComponent from "./components/dashboard/PrescriptionComponent";
+import UploadsComponent from "./components/dashboard/UploadsComponent";
+
 import "./App.css";
 
 // Protected Route Wrapper
@@ -42,12 +50,21 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardLayout />
+              <DashboardPage />
             </ProtectedRoute>
           }
         >
-          <Route index element={<Overview />} />
-          <Route path="inventory" element={<Inventory />} />
+          {/* Nested routes for dashboard sections can be added here in the future */}
+          {/* Default route: matches /dashboard */}
+
+          <Route index element={<Navigate to="stats" replace />} />
+
+          {/* Nested routes: match /dashboard/... */}
+          <Route path="stats" element={<StatsComponent />} />
+          <Route path="inventory" element={<InventoryComponent />} />
+          <Route path="prescription" element={<PrescriptionComponent />} />
+          <Route path="orders" element={<OrdersComponent />} />
+          <Route path="upload" element={<UploadsComponent />} />
         </Route>
 
         {/* 4. Catch-all (404) */}
