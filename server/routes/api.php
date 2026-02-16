@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Inventory\InventoryController;
 use App\Http\Controllers\Upload\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -35,5 +36,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/upload-single-drug', [UploadController::class, 'uploadSingleDrug'])->name('upload.single.drug');
 
     //fetch inventory
-    Route::get('/inventory', );
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 });
