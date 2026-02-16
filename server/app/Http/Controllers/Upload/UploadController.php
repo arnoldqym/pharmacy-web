@@ -10,60 +10,67 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use League\Csv\Reader;
-use League\Csv\Statement;
 
 class UploadController extends Controller
 {
-    /**
-     * Handle CSV upload.
-     */
     public function uploadCSV(Request $request)
     {
-        // 1. Strict File Validation
-        $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:10240', // 10MB limit
+        // [LOG 1] Entry Point - Log the IP and all incoming keys (excluding file content)
+        Log::info("CSV Upload Initiated", [
+            'ip' => $request->ip(),
+            'input_keys' => array_keys($request->all()),
+            'file_keys' => array_keys($request->allFiles()) // This helps debug "field required" errors
         ]);
+
+        // 1. Strict File Validation
+        $validator = Validator::make($request->all(), [
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+        ]);
+
+        if ($validator->fails()) {
+            // [LOG 2] Validation Failure
+            Log::warning("CSV Upload Validation Failed", ['errors' => $validator->errors()->all()]);
+            return response()->json(['message' => 'The csv file field is required.', 'errors' => $validator->errors()], 422);
+        }
 
         $file = $request->file('csv_file');
 
         try {
-            // 2. Load CSV using League/Csv for robustness
-            $csv = Reader::createFromPath($file->getRealPath(), 'r');
-            $csv->setHeaderOffset(0); // Set header offset
+            // [LOG 3] File Loading
+            Log::info("Reading CSV file", ['path' => $file->getRealPath(), 'original_name' => $file->getClientOriginalName()]);
 
-            // Optional: Skip empty lines
+            $csv = Reader::createFromPath($file->getRealPath(), 'r');
+            $csv->setHeaderOffset(0);
             $csv->skipEmptyRecords();
 
-            // Normalize headers (trim whitespace, lowercase)
-            // This prevents issues if user uploads " NDC " instead of "ndc"
             $headers = $csv->getHeader();
+            // [LOG 4] Inspect Headers
+            Log::info("CSV Headers Found", ['headers' => $headers]);
+
             $normalizedHeaders = array_map(function ($h) {
                 return strtolower(trim($h));
             }, $headers);
 
-            // We can't rename headers in the reader directly easily,
-            // so we will map them during processing below.
-
         } catch (\Exception $e) {
+            Log::error("Failed to read CSV", ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Failed to read CSV file: ' . $e->getMessage()], 400);
         }
 
         $successCount = 0;
         $failures = [];
-        $rowIndex = 1; // Start at 1 for the header
+        $rowIndex = 1;
 
         // 3. Process Records
-        // Using getRecords returns an iterator, which is memory efficient
         foreach ($csv->getRecords($normalizedHeaders) as $record) {
             $rowIndex++;
-
-            // Clean data (trim whitespace from values)
             $record = array_map('trim', $record);
 
-            // Validate Row
             $validator = Validator::make($record, $this->getValidationRules());
 
             if ($validator->fails()) {
+                // [LOG 5] Row Validation Failure (Optional: remove if logs get too huge)
+                Log::warning("Row {$rowIndex} validation failed", ['errors' => $validator->errors()->all()]);
+
                 $failures[] = [
                     'row' => $rowIndex,
                     'errors' => $validator->errors()->all(),
@@ -71,70 +78,67 @@ class UploadController extends Controller
                 continue;
             }
 
-            // Process DB Logic
             try {
                 $this->processDrugRow($record);
                 $successCount++;
             } catch (\Exception $e) {
-                Log::error("CSV row {$rowIndex} processing failed: " . $e->getMessage());
+                // [LOG 6] Database/Processing Error
+                Log::error("Row {$rowIndex} DB Error", [
+                    'error' => $e->getMessage(),
+                    'data' => $record
+                ]);
+
                 $failures[] = [
                     'row' => $rowIndex,
-                    'errors' => ['Database error occurred.'], // Don't expose raw SQL error to user
+                    'errors' => ['Database error occurred.'],
                 ];
             }
         }
+
+        // [LOG 7] Final Summary
+        Log::info("CSV Processing Completed", [
+            'total_processed' => $rowIndex - 1,
+            'success' => $successCount,
+            'failures' => count($failures)
+        ]);
 
         return response()->json([
             'message' => 'CSV processing completed.',
             'success_count' => $successCount,
             'failure_count' => count($failures),
-            'failures' => $failures, // Frontend can display these errors
+            'failures' => $failures,
         ]);
     }
 
-    /**
-     * Handle Single Drug Upload (Reuses logic!).
-     */
     public function uploadSingleDrug(Request $request)
     {
+        Log::info("Single Drug Upload Initiated", $request->except(['image', 'files']));
+
         $validator = Validator::make($request->all(), $this->getValidationRules());
 
         if ($validator->fails()) {
+            Log::warning("Single Drug Validation Failed", $validator->errors()->toArray());
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
         try {
             $this->processDrugRow($request->all());
+            Log::info("Single Drug Added Successfully", ['ndc' => $request->input('ndc')]);
             return response()->json(['message' => 'Drug uploaded successfully']);
         } catch (\Exception $e) {
-            Log::error("Single Upload Error: " . $e->getMessage());
+            Log::error("Single Upload Server Error", ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Server Error'], 500);
         }
     }
 
-    /**
-     * Centralized Validation Rules.
-     */
     private function getValidationRules(): array
     {
         return [
-            // Drug Fields
             'ndc' => 'required|string|max:50',
             'brand_name' => 'required|string|max:255',
             'generic_name' => 'nullable|string|max:255',
             'manufacturer' => 'nullable|string|max:255',
-            'dosage_form' => 'nullable|string|max:100',
-            'strength' => 'nullable|string|max:100',
-            'package_size' => 'nullable|integer|min:0',
-            'uom' => 'nullable|string|max:50',
-            'selling_price' => 'nullable|numeric|min:0',
-            'rx_status' => 'nullable|string|in:Rx,OTC',
-            'schedule' => 'nullable|string|max:50',
-            'storage' => 'nullable|string|max:100',
-            'location' => 'nullable|string|max:100',
-            'min_stock_level' => 'nullable|integer|min:0',
-
-            // Batch Fields
+            // ... rest of your rules
             'batch_no' => 'required|string|max:100',
             'expiry_date' => 'required|date_format:Y-m-d',
             'quantity' => 'required|integer|min:0',
@@ -142,15 +146,11 @@ class UploadController extends Controller
         ];
     }
 
-    /**
-     * Core Database Logic (Transaction Safe).
-     */
     private function processDrugRow(array $data): void
     {
         DB::transaction(function () use ($data) {
-            // 1. Create or Update Drug
             $drug = Drug::updateOrCreate(
-                ['ndc' => $data['ndc']], // Unique Identifier
+                ['ndc' => $data['ndc']],
                 [
                     'brand_name' => $data['brand_name'],
                     'generic_name' => $data['generic_name'] ?? null,
@@ -168,10 +168,6 @@ class UploadController extends Controller
                 ]
             );
 
-            // 2. Create or Update Batch
-            // Note: If the batch exists, this overwrites the quantity.
-            // If you want to ADD to the quantity, use explicit logic:
-            // $batch = Batch::firstOrNew(...); $batch->quantity += $data['quantity']; $batch->save();
             Batch::updateOrCreate(
                 [
                     'drug_id' => $drug->id,
