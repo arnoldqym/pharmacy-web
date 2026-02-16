@@ -27,7 +27,7 @@ export interface AuthState {
 export interface Batch {
   batchNo: string;
   expiryDate: string;
-  quantity: string | number;
+  quantity: string;
 }
 
 export interface SingleDrugForm {
@@ -60,7 +60,7 @@ export interface Batch {
   drug_id: number;
   batch_no: string;
   expiry_date: string; // Dates are returned as strings in JSON
-  quantity: string | number; // Depending on how the backend sends it, it could be a string or number
+  quantity: string; // Depending on how the backend sends it, it could be a string or number
   cost_price: string | number;
   created_at: string;
   updated_at: string;
