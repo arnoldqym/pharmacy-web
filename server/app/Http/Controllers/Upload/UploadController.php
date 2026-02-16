@@ -65,6 +65,14 @@ class UploadController extends Controller
             $rowIndex++;
             $record = array_map('trim', $record);
 
+            // Convert any common date format to Y-m-d
+            if (!empty($record['expiry_date'])) {
+                $timestamp = strtotime($record['expiry_date']);
+                if ($timestamp) {
+                    $record['expiry_date'] = date('Y-m-d', $timestamp);
+                }
+            }
+
             $validator = Validator::make($record, $this->getValidationRules());
 
             if ($validator->fails()) {
