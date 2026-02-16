@@ -1,0 +1,51 @@
+﻿ndc,brand_name,generic_name,manufacturer,dosage_form,strength,package_size,uom,batch_no,expiry_date,quantity,cost_price,selling_price,rx_status,schedule,storage,location,min_stock_level
+12345-678-90,Tylenol,Acetaminophen,Johnson & Johnson,Tablet,500mg,100,tablets,B2201A,12/31/2025,250,5.5,12.99,OTC,N/A,Room temperature,Aisle 3,50
+00006-0951-54,Singulair,Montelukast,Merck,Tablet,10mg,30,tablets,MK8821,11/15/2026,100,12.4,45,Rx,N/A,Room temperature,Aisle 1,20
+00069-1520-68,Lipitor,Atorvastatin,Pfizer,Tablet,20mg,90,tablets,PZ1102,5/20/2027,500,15.2,85,Rx,N/A,Room temperature,Aisle 2,100
+00173-0639-02,Ventolin HFA,Albuterol,GSK,Inhaler,90mcg,1,inhaler,GSK443,9/12/2026,60,22,65,Rx,N/A,Room temperature,Aisle 4,15
+50458-0578-30,Xarelto,Rivaroxaban,Janssen,Tablet,20mg,30,tablets,JN9910,1/30/2027,45,410,580,Rx,N/A,Room temperature,Aisle 2,10
+00002-4462-30,Cymbalta,Duloxetine,Eli Lilly,Capsule,60mg,30,capsules,LY5521,8/14/2026,120,8.5,32,Rx,N/A,Room temperature,Aisle 5,30
+00088-2220-33,Lantus,Insulin Glargine,Sanofi,Vial,100 units/mL,10,mL,SN1120,12/1/2026,25,65,110,Rx,N/A,Refrigerated,Fridge A,5
+00093-0311-05,Amoxicillin,Amoxicillin,Teva,Capsule,500mg,500,capsules,TV7782,3/10/2026,2,35,115,Rx,N/A,Room temperature,Aisle 1,1
+60505-2578-01,Ativan,Lorazepam,Apotex,Tablet,1mg,100,tablets,AP9921,6/22/2026,300,18,55,Rx,C-IV,Room temperature,Safe,50
+00378-0018-01,Synthroid,Levothyroxine,Mylan,Tablet,100mcg,100,tablets,MY4410,10/18/2027,400,12,42,Rx,N/A,Room temperature,Aisle 2,80
+00007-4155-20,Augmentin,Amoxicillin/Clavulanate,GSK,Tablet,875mg,20,tablets,GSK881,4/5/2026,80,24.5,62,Rx,N/A,Room temperature,Aisle 1,20
+00003-0227-05,Glucophage,Metformin,BMS,Tablet,500mg,100,tablets,BM1122,11/30/2026,250,4.2,18,Rx,N/A,Room temperature,Aisle 2,50
+00006-0470-30,Zocor,Simvastatin,Merck,Tablet,40mg,30,tablets,MK3321,2/14/2027,150,6,24,Rx,N/A,Room temperature,Aisle 2,40
+00310-0720-30,Nexium,Esomeprazole,AstraZeneca,Capsule,40mg,30,capsules,AZ0092,7/20/2026,90,145,280,Rx,N/A,Room temperature,Aisle 3,25
+00074-3041-13,Humira,Adalimumab,AbbVie,Injection,40mg/0.4mL,2,pens,AB6654,10/10/2026,10,2400,3200,Rx,N/A,Refrigerated,Fridge A,2
+00006-0277-31,Cozaar,Losartan,Merck,Tablet,50mg,30,tablets,MK5543,1/1/2027,200,9,35,Rx,N/A,Room temperature,Aisle 2,50
+00456-0630-01,Viagra,Sildenafil,Pfizer,Tablet,50mg,10,tablets,PZ9921,12/15/2026,100,150,450,Rx,N/A,Room temperature,Aisle 5,10
+00007-3235-20,Coreg,Carvedilol,GSK,Tablet,12.5mg,100,tablets,GSK331,8/8/2026,180,11.5,48,Rx,N/A,Room temperature,Aisle 2,30
+00002-3227-30,Prozac,Fluoxetine,Eli Lilly,Capsule,20mg,30,capsules,LY8821,5/12/2027,140,7.5,29,Rx,N/A,Room temperature,Aisle 5,30
+00071-0155-23,Neurontin,Gabapentin,Pfizer,Capsule,300mg,100,capsules,PZ3345,9/25/2026,220,14,58,Rx,N/A,Room temperature,Aisle 5,40
+00068-0590-30,Allegra,Fexofenadine,Sanofi,Tablet,180mg,30,tablets,SN4432,3/30/2027,300,8.5,19.99,OTC,N/A,Room temperature,Aisle 3,60
+50458-0510-60,Concerta,Methylphenidate,Janssen,Tablet,36mg,100,tablets,JN1122,11/5/2026,50,180,350,Rx,C-II,Room temperature,Safe,10
+00002-4112-27,Cialis,Tadalafil,Eli Lilly,Tablet,20mg,30,tablets,LY0012,4/22/2027,40,110,290,Rx,N/A,Room temperature,Aisle 5,10
+00115-1322-01,Vicodin,Hydrocodone/APAP,AbbVie,Tablet,5/300mg,100,tablets,AB4451,2/28/2026,150,45,125,Rx,C-II,Room temperature,Safe,30
+00009-0047-04,Xanax,Alprazolam,Pfizer,Tablet,0.5mg,100,tablets,PZ7761,6/30/2026,100,12,65,Rx,C-IV,Room temperature,Safe,25
+00085-1197-01,Claritin,Loratadine,Bayer,Tablet,10mg,30,tablets,BY2210,7/15/2027,400,4.5,14.99,OTC,N/A,Room temperature,Aisle 3,100
+00069-3010-30,Zoloft,Sertraline,Pfizer,Tablet,50mg,30,tablets,PZ5541,1/20/2027,240,6,28,Rx,N/A,Room temperature,Aisle 5,50
+00006-0706-31,Fosamax,Alendronate,Merck,Tablet,70mg,4,tablets,MK1123,10/12/2026,80,5.5,45,Rx,N/A,Room temperature,Aisle 6,20
+00003-0803-31,Plavix,Clopidogrel,BMS,Tablet,75mg,30,tablets,BM8821,9/1/2026,150,10,75,Rx,N/A,Room temperature,Aisle 2,30
+00004-0259-01,Valium,Diazepam,Roche,Tablet,5mg,100,tablets,RH4432,5/18/2027,90,14.5,52,Rx,C-IV,Room temperature,Safe,20
+00024-5850-31,Ambien,Zolpidem,Sanofi,Tablet,10mg,30,tablets,SN9921,8/30/2026,120,8,45,Rx,C-IV,Room temperature,Safe,30
+00007-3108-20,Advair Diskus,Fluticasone/Salmeterol,GSK,Inhaler,250/50,1,inhaler,GSK221,12/15/2026,45,210,380,Rx,N/A,Room temperature,Aisle 4,10
+00002-1436-01,Eliquis,Apixaban,BMS/Pfizer,Tablet,5mg,60,tablets,BP1143,11/20/2027,200,320,540,Rx,N/A,Room temperature,Aisle 2,40
+00009-0347-02,Medrol,Methylprednisolone,Pfizer,Tablet,4mg,21,tablets,PZ8811,4/10/2026,100,4.5,18,Rx,N/A,Room temperature,Aisle 1,25
+00006-3840-31,Januvia,Sitagliptin,Merck,Tablet,100mg,30,tablets,MK4432,6/5/2027,90,380,520,Rx,N/A,Room temperature,Aisle 2,20
+00007-4852-20,Flonase,Fluticasone,GSK,Spray,50mcg,120,doses,GSK110,2/22/2027,150,9,22.5,OTC,N/A,Room temperature,Aisle 3,40
+00074-3246-30,Synthroid,Levothyroxine,AbbVie,Tablet,125mcg,90,tablets,AB2231,10/10/2027,180,24,68,Rx,N/A,Room temperature,Aisle 2,50
+00003-0105-31,Abilify,Aripiprazole,Otsuka,Tablet,10mg,30,tablets,OT9912,1/15/2027,60,450,780,Rx,N/A,Room temperature,Aisle 5,10
+00169-3687-12,Ozempic,Semaglutide,Novo Nordisk,Pen,1mg/dose,1,pen,NN5541,8/18/2026,30,680,950,Rx,N/A,Refrigerated,Fridge B,5
+00069-0417-68,Lyrica,Pregabalin,Pfizer,Capsule,75mg,90,capsules,PZ1122,9/30/2026,110,140,310,Rx,C-V,Room temperature,Aisle 5,20
+00006-0001-01,Gardasil 9,HPV Vaccine,Merck,Vial,0.5mL,10,vials,MK0012,11/11/2027,5,1800,2400,Rx,N/A,Refrigerated,Fridge B,2
+00504-0331-01,Zantac 360,Famotidine,Sanofi,Tablet,20mg,50,tablets,SN3321,4/30/2027,200,6.5,15.99,OTC,N/A,Room temperature,Aisle 3,50
+00378-0208-01,Verapamil,Verapamil,Mylan,Tablet,80mg,100,tablets,MY7712,2/20/2027,150,11,38,Rx,N/A,Room temperature,Aisle 2,30
+00093-7155-98,Lisinopril,Lisinopril,Teva,Tablet,10mg,500,tablets,TV1123,7/10/2027,2,25,95,Rx,N/A,Room temperature,Aisle 2,1
+00002-1433-01,Trulicity,Dulaglutide,Eli Lilly,Pen,1.5mg/0.5mL,4,pens,LY4432,5/5/2026,20,550,820,Rx,N/A,Refrigerated,Fridge B,4
+00069-4210-30,Celebrex,Celecoxib,Pfizer,Capsule,200mg,30,capsules,PZ8812,3/14/2027,100,22,115,Rx,N/A,Room temperature,Aisle 1,25
+00378-1809-01,Gabapentin,Gabapentin,Mylan,Capsule,100mg,100,capsules,MY3321,12/12/2026,300,9,42,Rx,N/A,Room temperature,Aisle 5,50
+00006-0021-31,Prilosec,Omeprazole,Merck/P&G,Capsule,20mg,30,capsules,MK1102,6/30/2027,400,10,24.99,OTC,N/A,Room temperature,Aisle 3,100
+00004-0038-22,Tamiflu,Oseltamivir,Roche,Capsule,75mg,10,capsules,RH2210,9/15/2026,150,45,110,Rx,N/A,Room temperature,Aisle 1,50
+00003-0501-11,Abilify Maintena,Aripiprazole,Otsuka,Vial,400mg,1,vial,OT0043,10/20/2026,8,1200,1850,Rx,N/A,Room temperature,Aisle 5,2
