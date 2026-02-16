@@ -53,3 +53,45 @@ export interface UploadStatus {
   type: "success" | "error" | "";
   message: string;
 }
+
+// Inventory interfaces
+export interface Batch {
+  id: number;
+  drug_id: number;
+  batch_no: string;
+  expiry_date: string; // Dates are returned as strings in JSON
+  quantity: string; // Depending on how the backend sends it, it could be a string or number
+  cost_price: string | number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Drug {
+  id: number;
+  ndc: string;
+  brand_name: string | null;
+  generic_name: string;
+  manufacturer: string;
+  dosage_form: string;
+  strength: string;
+  package_size: number;
+  uom: string;
+  selling_price: string | number;
+  rx_status: "Rx" | "OTC"; // Using string literals for stricter typing
+  schedule: string | null;
+  storage: string | null;
+  min_stock_level: number;
+  location: string | null;
+  created_at: string;
+  updated_at: string;
+
+  // Relations & Computed Fields from Controller
+  batches?: Batch[];
+  total_stock: number; // This comes from our withSum alias
+}
+
+// Optional: Define the API response structure
+export interface InventoryResponse {
+  success: boolean;
+  data: Drug[];
+}
