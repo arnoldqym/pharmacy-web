@@ -33,4 +33,7 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::post('/upload-csv', [UploadController::class, 'uploadCSV'])->name('upload.csv');
     Route::post('/upload-single-drug', [UploadController::class, 'uploadSingleDrug'])->name('upload.single.drug');
+
+    //fetch inventory
+    Route::get('/inventory', );
 });
