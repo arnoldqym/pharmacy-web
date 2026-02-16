@@ -82,10 +82,10 @@ export default function Navbar() {
             : 'top-4 py-4'
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+        <div className="max-w-350 mx-auto px-4 sm:px-6">
           <nav className="flex items-center justify-between bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-2.5 border border-teal-50 shadow-lg shadow-teal-100/20">
             {/* Logo */}
-            <a href="/" className="flex-shrink-0" aria-label="Home">
+            <a href="/" className="shrink-0" aria-label="Home">
               <img
                 src="/assets/images/logo.png"
                 alt="Pharmacy Logo"
