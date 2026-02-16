@@ -31,7 +31,7 @@ function InventoryComponent() {
 
         // Our controller nests the array inside a 'data' property
         setInventory(result.data || []);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch inventory:", err);
         setError(err.message);
       } finally {
