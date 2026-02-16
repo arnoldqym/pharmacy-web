@@ -10,7 +10,6 @@ interface Drug {
   min_stock_level: number;
   total_stock: number;
   uom: string;
-  // ... other fields if needed
 }
 
 interface PaginationMeta {
@@ -131,24 +130,28 @@ function InventoryComponent() {
   // --- Loading skeletons ---
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[...Array(perPage)].map((_, i) => (
-          <div
-            key={i}
-            className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm animate-pulse"
-          >
-            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded"></div>
-            </div>
-            <div className="mt-4 pt-3 border-t flex justify-between">
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-6 bg-gray-200 rounded w-1/4"></div>
-            </div>
+      <div className="p-6 bg-slate-50 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          <div className="h-20 bg-white rounded-xl shadow-sm mb-8 animate-pulse"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(perPage)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse h-64 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="h-6 bg-slate-200 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-slate-100 rounded w-1/2"></div>
+                </div>
+                <div className="h-20 bg-slate-100 rounded-xl w-full my-4"></div>
+                <div className="flex justify-between">
+                  <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     );
   }
@@ -156,198 +159,428 @@ function InventoryComponent() {
   // --- Error state ---
   if (error) {
     return (
-      <div className="text-red-500 p-4">
-        <p>Error loading inventory: {error}</p>
-        <button
-          onClick={fetchInventory}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg"
-        >
-          Retry
-        </button>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center border border-red-100">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <svg
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Failed to load inventory
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">{error}</p>
+          <button
+            onClick={fetchInventory}
+            className="w-full inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
 
   // --- Main render ---
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Current Inventory
-      </h2>
+    <div className="min-h-screen bg-slate-50/50 p-6 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              Inventory
+            </h2>
+            <p className="text-slate-500 mt-1">
+              Manage stock levels, locations, and expiration.
+            </p>
+          </div>
+          <div className="text-right hidden md:block">
+            <p className="text-sm font-medium text-slate-400">Total Items</p>
+            <p className="text-2xl font-bold text-slate-700">{totalItems}</p>
+          </div>
+        </div>
 
-      {/* Search & Filter Bar */}
-      <div className="mb-6 flex flex-wrap items-center gap-4">
-        {/* Search input */}
-        <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search by brand, generic, or NDC..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border rounded-lg py-2 pl-10 pr-4 focus:ring-2 focus:ring-blue-500"
-          />
-          <svg
-            className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        {/* Control Bar (Search & Filter) */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col lg:flex-row items-center gap-4 sticky top-4 z-10 backdrop-blur-xl bg-white/90">
+          {/* Search input */}
+          <div className="relative flex-1 w-full">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg
+                className="h-5 w-5 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search by brand, generic, or NDC..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full pl-10 pr-10 py-2.5 bg-slate-50 border-slate-200 border rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
             />
-          </svg>
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm("")}
-              className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* Low stock toggle */}
-        <label className="flex items-center gap-2 whitespace-nowrap">
-          <input
-            type="checkbox"
-            checked={lowStockOnly}
-            onChange={(e) => {
-              setLowStockOnly(e.target.checked);
-              setCurrentPage(1);
-            }}
-            className="rounded"
-          />
-          <span>Low stock only</span>
-        </label>
-
-        {/* Per page selector */}
-        <select
-          value={perPage}
-          onChange={(e) => {
-            setPerPage(Number(e.target.value));
-            setCurrentPage(1);
-          }}
-          className="border rounded-lg py-2 px-3"
-        >
-          <option value="15">15 per page</option>
-          <option value="30">30 per page</option>
-          <option value="50">50 per page</option>
-        </select>
-
-        {/* Export CSV button */}
-        <button
-          onClick={exportToCSV}
-          disabled={inventory.length === 0}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Export CSV
-        </button>
-      </div>
-
-      {/* Inventory Grid */}
-      {inventory.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No matching inventory items found.</p>
-          {(searchTerm || lowStockOnly) && (
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setLowStockOnly(false);
-              }}
-              className="mt-4 text-blue-600 underline"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {inventory.map((drug) => {
-              const isLowStock = drug.total_stock <= drug.min_stock_level;
-              return (
-                <div
-                  key={drug.id}
-                  className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <div className="flex-grow">
-                    <h3
-                      className="font-bold text-lg text-gray-800 truncate"
-                      title={drug.brand_name || drug.generic_name}
-                    >
-                      {drug.brand_name || drug.generic_name}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-3">
-                      {drug.generic_name}
-                    </p>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
 
-                    <div className="text-sm text-gray-600 space-y-1">
-                      <p>
-                        <span className="font-semibold">NDC:</span> {drug.ndc}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Location:</span>{" "}
-                        {drug.location || "Unassigned"}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Min Level:</span>{" "}
-                        {drug.min_stock_level}
-                      </p>
+          <div className="flex w-full lg:w-auto items-center gap-3">
+            {/* Low stock toggle */}
+            <label
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all select-none ${
+                lowStockOnly
+                  ? "bg-red-50 border-red-200 text-red-700"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={lowStockOnly}
+                onChange={(e) => {
+                  setLowStockOnly(e.target.checked);
+                  setCurrentPage(1);
+                }}
+                className="hidden" // Hiding the actual checkbox for custom style
+              />
+              <svg
+                className={`h-4 w-4 ${
+                  lowStockOnly ? "text-red-500" : "text-slate-400"
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <span className="text-sm font-medium">Low Stock Only</span>
+            </label>
+
+            {/* Per page selector */}
+            <div className="relative">
+              <select
+                value={perPage}
+                onChange={(e) => {
+                  setPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer hover:bg-slate-50 transition-colors"
+              >
+                <option value="15">15 / page</option>
+                <option value="30">30 / page</option>
+                <option value="50">50 / page</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Export CSV button */}
+            <button
+              onClick={exportToCSV}
+              disabled={inventory.length === 0}
+              className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-indigo-200 transition-all flex items-center gap-2"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              <span className="text-sm font-medium hidden sm:inline">
+                Export
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Inventory Grid */}
+        {inventory.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+            <div className="bg-slate-50 p-4 rounded-full mb-4">
+              <svg
+                className="h-8 w-8 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-slate-900">
+              No results found
+            </h3>
+            <p className="text-slate-500 mt-1 max-w-sm text-center">
+              We couldn't find any inventory matching your search.
+            </p>
+            {(searchTerm || lowStockOnly) && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setLowStockOnly(false);
+                }}
+                className="mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-800 underline underline-offset-2 transition-colors"
+              >
+                Clear all filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {inventory.map((drug) => {
+                const isLowStock = drug.total_stock <= drug.min_stock_level;
+                return (
+                  <div
+                    key={drug.id}
+                    className="group bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden"
+                  >
+                    {/* Top status bar (decorative) */}
+                    <div
+                      className={`absolute top-0 left-0 w-full h-1 ${
+                        isLowStock ? "bg-red-500" : "bg-emerald-500"
+                      }`}
+                    ></div>
+
+                    {/* Card Header */}
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-full pr-2">
+                        <h3
+                          className="font-bold text-lg text-slate-800 truncate leading-tight"
+                          title={drug.brand_name || drug.generic_name}
+                        >
+                          {drug.brand_name || drug.generic_name}
+                        </h3>
+                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-1 truncate">
+                          {drug.generic_name}
+                        </p>
+                      </div>
+                      {isLowStock ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-red-50 text-red-700 border border-red-100 whitespace-nowrap">
+                          Low
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap">
+                          OK
+                        </span>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-700">
-                      Active Stock:
-                    </span>
-                    <span
-                      className={`text-lg font-bold ${
-                        isLowStock ? "text-red-600" : "text-green-600"
+                    {/* Stock Display (Centerpiece) */}
+                    <div
+                      className={`rounded-xl p-4 text-center mb-4 transition-colors ${
+                        isLowStock ? "bg-red-50/50" : "bg-slate-50"
                       }`}
                     >
-                      {drug.total_stock ?? 0}{" "}
-                      <span className="text-xs font-normal text-gray-500">
-                        {drug.uom}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                      <p className="text-xs text-slate-500 font-medium mb-1">
+                        Available Stock
+                      </p>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span
+                          className={`text-3xl font-extrabold tracking-tight ${
+                            isLowStock ? "text-red-600" : "text-slate-800"
+                          }`}
+                        >
+                          {drug.total_stock ?? 0}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-400 uppercase">
+                          {drug.uom}
+                        </span>
+                      </div>
+                    </div>
 
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between mt-8">
-            <p className="text-sm text-gray-600">
-              Showing {inventory.length} of {totalItems} items
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50"
-              >
-                Next
-              </button>
+                    {/* Details Grid */}
+                    <div className="mt-auto space-y-2.5">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2 text-slate-400">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                            />
+                          </svg>
+                          <span className="font-medium text-xs">NDC</span>
+                        </div>
+                        <span className="font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded text-xs">
+                          {drug.ndc}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2 text-slate-400">
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          <span className="font-medium text-xs">Location</span>
+                        </div>
+                        <span className="text-slate-700 font-medium text-xs">
+                          {drug.location || "—"}
+                        </span>
+                      </div>
+
+                      <div className="pt-3 mt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                        <span className="text-slate-400">Min. Level</span>
+                        <span className="font-semibold text-slate-700">
+                          {drug.min_stock_level}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
-        </>
-      )}
+
+            {/* Footer / Pagination */}
+            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-slate-200 mt-2 gap-4">
+              <p className="text-sm text-slate-500">
+                Showing{" "}
+                <span className="font-medium text-slate-900">
+                  {inventory.length}
+                </span>{" "}
+                results
+              </p>
+
+              <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  aria-label="Previous Page"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+
+                <div className="px-4 text-sm font-medium text-slate-700 border-x border-slate-100">
+                  <span className="text-indigo-600">{currentPage}</span>
+                  <span className="text-slate-400 mx-1">/</span>
+                  <span>{totalPages}</span>
+                </div>
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  aria-label="Next Page"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
