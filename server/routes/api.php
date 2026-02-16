@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Inventory\InventoryController;
+use App\Http\Controllers\Overview\OverviewController;
 use App\Http\Controllers\Upload\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -37,4 +38,5 @@ Route::middleware('auth:api')->group(function () {
 
     //fetch inventory
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index');
 });
