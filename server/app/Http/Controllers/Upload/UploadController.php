@@ -147,6 +147,7 @@ class UploadController extends Controller
             'brand_name' => 'required|string|max:255',
             'generic_name' => 'nullable|string|max:255',
             'manufacturer' => 'nullable|string|max:255',
+            'schedule' => 'nullable|string|max:10',
             // ... rest of your rules
             'batch_no' => 'required|string|max:100',
             'expiry_date' => 'required',
