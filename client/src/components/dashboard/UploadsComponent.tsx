@@ -58,7 +58,7 @@ function UploadsComponent() {
     console.log("token is:", localStorage.getItem("token"));
     // Api call to upload CSV file
     const formData = new FormData();
-    formData.append("file", csvFile);
+    formData.append("csv_file", csvFile);
     axios
       .post(`${API_BASE_URL}/upload-csv`, formData, {
         headers: {
