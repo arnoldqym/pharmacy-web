@@ -8,8 +8,9 @@ import {
   Menu,
   X,
   Upload,
+  Home,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Navigate, NavLink } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -170,7 +171,17 @@ function DashboardLayout({
         </nav>
 
         <div className="p-4 text-xs text-center text-gray-400 border-t border-gray-200/60">
-          v2.0 · modern care
+          v2.0 · modern care <br />
+          <NavLink
+            to="/"
+            className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${"bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"}`}
+          >
+            <Home
+              size={20}
+              className={`transition-transform group-hover:scale-110 ${"text-gray-500"}`}
+            />
+            <span>Home</span>
+          </NavLink>
         </div>
       </aside>
 

@@ -1,5 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, User, ChevronDown, Globe, Menu, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  ChevronDown,
+  Globe,
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,8 +22,8 @@ export default function Navbar() {
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Close dropdowns when clicking outside
@@ -35,49 +43,52 @@ export default function Navbar() {
         setIsMobileMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Products', href: '/products' },
+    { name: "Home", href: "/" },
+    { name: "Products", href: "/products" },
     {
-      name: 'Others',
+      name: "Others",
       submenu: [
-        { name: 'Services', href: '/services' },
-        { name: 'FAQs', href: '/faq' },
-        { name: 'Testimonials', href: '/testimonials' },
+        { name: "Services", href: "/services" },
+        { name: "FAQs", href: "/faq" },
+        { name: "Dashboard", href: "/dashboard" },
       ],
     },
-    { name: 'About', href: '/about' },
+    { name: "About", href: "/about" },
   ];
 
   return (
     <>
       <header
-        className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
-          ? 'top-0 bg-white/80 backdrop-blur-md shadow-sm py-2'
-          : 'top-4 py-4'
-          }`}
+        className={`fixed w-full z-50 transition-all duration-500 ${
+          isScrolled
+            ? "top-0 bg-white/80 backdrop-blur-md shadow-sm py-2"
+            : "top-4 py-4"
+        }`}
       >
         <div className="max-w-350 mx-auto px-4 sm:px-6">
           <nav className="flex items-center justify-between bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-2.5 border border-teal-50 shadow-lg shadow-teal-100/20">
             {/* Logo */}
             <a href="/" className="shrink-0" aria-label="Home">
-              <div className="text-2xl font-bold bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">Pharma<span className="text-gray-800">Care</span></div>
+              <div className="text-2xl font-bold bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+                Pharma<span className="text-gray-800">Care</span>
+              </div>
             </a>
 
             {/* Desktop Navigation */}
@@ -178,8 +189,9 @@ export default function Navbar() {
       {/* Mobile Sidebar */}
       <div
         ref={mobileMenuRef}
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <div className="flex flex-col h-full pt-20 pb-6 px-6">
           <div className="flex-1 space-y-1">
@@ -203,10 +215,16 @@ export default function Navbar() {
               Contact Us
             </a>
             <div className="flex items-center justify-center gap-4 pt-2">
-              <a href="/login" className="text-slate-500 hover:text-teal-600 p-2">
+              <a
+                href="/login"
+                className="text-slate-500 hover:text-teal-600 p-2"
+              >
                 <User size={20} />
               </a>
-              <a href="/cart" className="text-slate-500 hover:text-teal-600 p-2 relative">
+              <a
+                href="/cart"
+                className="text-slate-500 hover:text-teal-600 p-2 relative"
+              >
                 <ShoppingCart size={20} />
                 <span className="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                   0
