@@ -51,7 +51,7 @@ function DashboardLayout({
         }`}
       >
         <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200/60">
-          <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+          <div className="text-2xl font-bold bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
             Pharma<span className="text-gray-800">Care</span>
           </div>
           <button
@@ -69,7 +69,7 @@ function DashboardLayout({
               <div
                 className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
                     : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
                 }`}
               >
@@ -90,7 +90,7 @@ function DashboardLayout({
               <div
                 className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
                     : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
                 }`}
               >
@@ -111,7 +111,7 @@ function DashboardLayout({
               <div
                 className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
                     : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
                 }`}
               >
@@ -132,7 +132,7 @@ function DashboardLayout({
               <div
                 className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
                     : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
                 }`}
               >
@@ -153,7 +153,7 @@ function DashboardLayout({
               <div
                 className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
                     : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
                 }`}
               >
@@ -185,15 +185,15 @@ function DashboardLayout({
             >
               <Menu size={20} />
             </button>
-            <h1 className="text-lg font-semibold text-gray-800 truncate sm:text-xl bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-lg font-semibold text-gray-800 truncate sm:text-xl bg-linear-to-r from-gray-800 to-gray-600 bg-clip-text">
               {title}
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+          <div className="flex items-center gap-3 ml-4 shrink-0">
             <button
               onClick={onLogout}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-teal-500 rounded-xl hover:from-emerald-700 hover:to-teal-600 shadow-md shadow-emerald-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-emerald-600 to-teal-500 rounded-xl hover:from-emerald-700 hover:to-teal-600 shadow-md shadow-emerald-200 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
             >
               <LogOut size={16} className="mr-2" />
               <span className="hidden sm:inline">Logout</span>
