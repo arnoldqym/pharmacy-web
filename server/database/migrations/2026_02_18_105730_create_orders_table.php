@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,6 +12,10 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('order_number')->unique(); // e.g., ORD-2024-001
+            $table->string('status')->default('pending'); // pending, completed, cancelled
+            $table->decimal('total_amount', 12, 2)->default(0.00);
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
