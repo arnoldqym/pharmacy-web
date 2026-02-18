@@ -42,5 +42,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index');
 
     //process orders
-    Route::post('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 });
