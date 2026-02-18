@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Drug;
+use App\Models\Batch;
 
 class InventoryController extends Controller
 {
