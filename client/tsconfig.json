@@ -5,7 +5,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "jsx": "react-jsx", // <--- Add or change this line
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
