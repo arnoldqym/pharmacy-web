@@ -44,6 +44,7 @@ class Batch extends Model
     ];
 
     /**
+     *
      * Get the drug that owns this batch.
      */
     public function drug(): BelongsTo
@@ -52,6 +53,7 @@ class Batch extends Model
     }
 
     /**
+     *
      * Scope a query to only include batches that are expiring before a given date.
      */
     public function scopeExpiringBefore($query, $date)
