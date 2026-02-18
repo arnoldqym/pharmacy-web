@@ -1,4 +1,3 @@
-import React from "react";
 import HomepageLayout from "../layouts/HomepageLayout";
 import HeroSection from "../components/Homepage/HeroSection";
 
