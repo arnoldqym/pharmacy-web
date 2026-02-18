@@ -171,7 +171,7 @@ function DashboardLayout({
         </nav>
 
         <div className="p-4 text-xs text-center text-gray-400 border-t border-gray-200/60">
-          v2.0 · modern care <br />
+          v2.0 &copy; 2026 PharmaCare Inc. <br /> <br />
           <NavLink
             to="/"
             className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${"bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"}`}
