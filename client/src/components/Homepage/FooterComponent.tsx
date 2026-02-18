@@ -1,11 +1,10 @@
 import React from 'react';
-// Make sure to install react-icons: npm install react-icons
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import { MdLocalPhone, MdEmail, MdLocationOn } from 'react-icons/md';
 
 export default function FooterComponent() {
   return (
-    <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <footer className="max-w-full mx-auto px-2 sm:px-5 lg:px-6 py-8 md:py-6">
       {/* Main footer card with border-radius */}
       <div className="bg-linear-to-br from-white to-emerald-50 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 border border-emerald-100">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
