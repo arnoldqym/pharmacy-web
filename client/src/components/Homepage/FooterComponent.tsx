@@ -11,8 +11,7 @@ export default function FooterComponent() {
           {/* Brand & About */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <span className="text-3xl font-bold text-emerald-700">Pharma</span>
-              <span className="text-3xl font-light text-gray-600">Care</span>
+              <div className="text-2xl font-bold bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">Pharma<span className="text-gray-800">Care</span></div>
             </div>
             <p className="text-gray-600 leading-relaxed">
               Your trusted partner for health and wellness. We provide quality medications and expert care.
