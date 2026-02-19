@@ -24,7 +24,7 @@ export default function DashboardShowcase() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 bg-white">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div className="text-center max-w-3xl mx-auto mb-8 md:mb-10">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
           Powerful Dashboard, Built for Pharmacies
