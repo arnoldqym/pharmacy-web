@@ -44,6 +44,7 @@ const OrdersComponent: React.FC = () => {
     fetchOrders();
   }, []);
 
+  // route for fetching orders
   const fetchOrders = async (): Promise<void> => {
     try {
       const response = await axios.get<Order[]>(`${Api_url}/orders`, {
@@ -61,6 +62,7 @@ const OrdersComponent: React.FC = () => {
     }
   };
 
+  // Route for posting a new order (for testing purposes)
   const handleCreateOrder = async (): Promise<void> => {
     try {
       const payload: CreateOrderPayload = {
