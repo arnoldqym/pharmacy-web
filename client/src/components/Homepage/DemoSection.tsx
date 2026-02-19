@@ -36,7 +36,7 @@ export default function DashboardShowcase() {
 
       {/* Dashboard Mockup / Screenshot Preview */}
       <div className="relative mb-10">
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+        <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
           {/* Top bar */}
           <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-2">
             <div className="flex gap-1.5">
