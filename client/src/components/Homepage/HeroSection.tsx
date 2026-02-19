@@ -1,12 +1,11 @@
-import React from 'react';
 import { Phone, ShoppingBag, Shield, CheckCircle } from 'lucide-react';
 
 export default function HeroSection() {
   return (
     <section className="relative w-full px-4 sm:px-6 lg:px-8 pt-20 pb-10 lg:pt-24 lg:pb-16">
-      <div className="max-w-[90rem] mx-auto bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-900/5 overflow-hidden border border-emerald-50 relative">
+      <div className="max-w-360 mx-auto bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-900/5 overflow-hidden border border-emerald-50 relative">
         
-        {/* MOBILE BACKGROUND: Scaled down and kept subtle */}
+        {/* MOBILE BACKGROUND */}
         <div className="absolute inset-0 z-0 lg:hidden overflow-hidden pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] opacity-40 blur-sm">
              <Illustration />
@@ -49,7 +48,7 @@ export default function HeroSection() {
             </div>
           </div>
           
-          {/* Desktop Column: Size reduced from max-w-lg to max-w-xs/sm */}
+          {/* Desktop Column */}
           <div className="hidden lg:flex relative p-16 items-center justify-center">
             <div className="absolute inset-0 bg-radial-gradient from-emerald-50/50 to-transparent opacity-60" />
             <div className="relative w-full max-w-xs xl:max-w-sm">
