@@ -7,7 +7,7 @@ export default function BackToTopButton() {
   // Show button when page is scrolled down 300px
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 300) {
+      if (window.scrollY > 100) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
