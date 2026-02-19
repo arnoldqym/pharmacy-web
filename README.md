@@ -13,9 +13,9 @@ A robust, full-stack web application designed to streamline pharmacy operations,
 
 ## 🛠 Tech Stack
 
-- **Frontend:** [React.js / Vue.js] with Tailwind CSS
-- **Backend:** [Laravel / Node.js]
-- **Database:** [MySQL / PostgreSQL]
+- **Frontend:** [React.js] with Tailwind CSS
+- **Backend:** [Laravel]
+- **Database:** [MySQL]
 - **State Management:** [Inertia.js / Redux / Pinia]
 - **Authentication:** [JWT / Sanctum]
 
@@ -28,7 +28,7 @@ Before you begin, ensure you have the following installed:
 - Node.js (v18+)
 - PHP (v8.1+) or relevant runtime
 - Composer or NPM/Yarn
-- A database engine (MySQL/PostgreSQL)
+- A database engine (MySQL)
 
 ### Installation
 
