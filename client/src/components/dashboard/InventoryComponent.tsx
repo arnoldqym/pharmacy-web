@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-// Types (you can keep them in a separate file)
+// Types
 interface Drug {
   id: number;
   brand_name: string | null;
@@ -127,29 +127,70 @@ function InventoryComponent() {
     link.click();
   };
 
-  // --- Loading skeletons ---
+  // --- Loading Skeletons (Hybrid) ---
   if (isLoading) {
     return (
-      <div className="p-6 bg-slate-50 min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <div className="h-20 bg-white rounded-xl shadow-sm mb-8 animate-pulse"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(perPage)].map((_, i) => (
+      <div className="p-4 md:p-6 bg-slate-50 min-h-screen">
+        <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+          <div className="h-20 bg-white rounded-xl shadow-sm animate-pulse"></div>
+
+          {/* Mobile Skeleton (Cards) */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {[...Array(5)].map((_, i) => (
               <div
-                key={i}
-                className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse h-64 flex flex-col justify-between"
+                key={`mob-skel-${i}`}
+                className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm animate-pulse h-48 flex flex-col justify-between"
               >
-                <div>
-                  <div className="h-6 bg-slate-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-slate-100 rounded w-1/2"></div>
-                </div>
-                <div className="h-20 bg-slate-100 rounded-xl w-full my-4"></div>
                 <div className="flex justify-between">
-                  <div className="h-4 bg-slate-200 rounded w-1/4"></div>
-                  <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+                  <div className="w-2/3">
+                    <div className="h-5 bg-slate-200 rounded w-full mb-2"></div>
+                    <div className="h-3 bg-slate-100 rounded w-2/3"></div>
+                  </div>
+                  <div className="h-6 w-16 bg-slate-100 rounded-full"></div>
                 </div>
+                <div className="h-12 bg-slate-50 rounded-lg w-full mt-4"></div>
               </div>
             ))}
+          </div>
+
+          {/* Desktop Skeleton (Table) */}
+          <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    {[...Array(5)].map((_, i) => (
+                      <th key={`head-skel-${i}`} className="px-6 py-4">
+                        <div className="h-4 bg-slate-200 rounded w-24 animate-pulse"></div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {[...Array(perPage)].map((_, i) => (
+                    <tr key={`row-skel-${i}`}>
+                      <td className="px-6 py-4">
+                        <div className="h-5 bg-slate-200 rounded w-48 mb-2 animate-pulse"></div>
+                        <div className="h-3 bg-slate-100 rounded w-32 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-slate-100 rounded w-24 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-slate-100 rounded w-16 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-6 bg-slate-100 rounded-full w-20 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="h-6 bg-slate-200 rounded w-12 ml-auto mb-2 animate-pulse"></div>
+                        <div className="h-3 bg-slate-100 rounded w-16 ml-auto animate-pulse"></div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -193,15 +234,15 @@ function InventoryComponent() {
 
   // --- Main render ---
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 font-sans text-slate-800">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50/50 p-4 md:p-6 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
               Inventory
             </h2>
-            <p className="text-slate-500 mt-1">
+            <p className="text-sm md:text-base text-slate-500 mt-1">
               Manage stock levels, locations, and expiration.
             </p>
           </div>
@@ -232,7 +273,7 @@ function InventoryComponent() {
             </div>
             <input
               type="text"
-              placeholder="Search by brand, generic, or NDC..."
+              placeholder="Search brand, generic, or NDC..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="block w-full pl-10 pr-10 py-2.5 bg-slate-50 border-slate-200 border rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
@@ -259,10 +300,10 @@ function InventoryComponent() {
             )}
           </div>
 
-          <div className="flex w-full lg:w-auto items-center gap-3">
+          <div className="flex w-full lg:w-auto items-center gap-2 md:gap-3 flex-wrap sm:flex-nowrap">
             {/* Low stock toggle */}
             <label
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all select-none ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2.5 rounded-lg border cursor-pointer transition-all select-none ${
                 lowStockOnly
                   ? "bg-red-50 border-red-200 text-red-700"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -275,12 +316,10 @@ function InventoryComponent() {
                   setLowStockOnly(e.target.checked);
                   setCurrentPage(1);
                 }}
-                className="hidden" // Hiding the actual checkbox for custom style
+                className="hidden"
               />
               <svg
-                className={`h-4 w-4 ${
-                  lowStockOnly ? "text-red-500" : "text-slate-400"
-                }`}
+                className={`h-4 w-4 ${lowStockOnly ? "text-red-500" : "text-slate-400"}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -292,18 +331,20 @@ function InventoryComponent() {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <span className="text-sm font-medium">Low Stock Only</span>
+              <span className="text-sm font-medium whitespace-nowrap">
+                Low Stock
+              </span>
             </label>
 
             {/* Per page selector */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-none">
               <select
                 value={perPage}
                 onChange={(e) => {
                   setPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer hover:bg-slate-50 transition-colors"
+                className="w-full sm:w-auto appearance-none bg-white border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer hover:bg-slate-50 transition-colors"
               >
                 <option value="15">15 / page</option>
                 <option value="30">30 / page</option>
@@ -330,7 +371,7 @@ function InventoryComponent() {
             <button
               onClick={exportToCSV}
               disabled={inventory.length === 0}
-              className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-indigo-200 transition-all flex items-center gap-2"
+              className="w-full sm:w-auto mt-2 sm:mt-0 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-indigo-200 transition-all flex items-center justify-center gap-2"
             >
               <svg
                 className="h-4 w-4"
@@ -345,14 +386,12 @@ function InventoryComponent() {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              <span className="text-sm font-medium hidden sm:inline">
-                Export
-              </span>
+              <span className="text-sm font-medium">Export</span>
             </button>
           </div>
         </div>
 
-        {/* Inventory Grid */}
+        {/* Empty State */}
         {inventory.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
             <div className="bg-slate-50 p-4 rounded-full mb-4">
@@ -389,126 +428,92 @@ function InventoryComponent() {
             )}
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="w-full">
+            {/* --- MOBILE VIEW: CARDS (Hidden on md screens and up) --- */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
               {inventory.map((drug) => {
                 const isLowStock = drug.total_stock <= drug.min_stock_level;
                 return (
                   <div
-                    key={drug.id}
-                    className="group bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden"
+                    key={`mobile-${drug.id}`}
+                    className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm relative overflow-hidden flex flex-col gap-3"
                   >
-                    {/* Top status bar (decorative) */}
+                    {/* Decorative left border for status */}
                     <div
-                      className={`absolute top-0 left-0 w-full h-1 ${
-                        isLowStock ? "bg-red-500" : "bg-emerald-500"
-                      }`}
+                      className={`absolute top-0 left-0 h-full w-1 ${isLowStock ? "bg-red-500" : "bg-emerald-500"}`}
                     ></div>
 
-                    {/* Card Header */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="w-full pr-2">
-                        <h3
-                          className="font-bold text-lg text-slate-800 truncate leading-tight"
-                          title={drug.brand_name || drug.generic_name}
-                        >
+                    {/* Header: Name & Status */}
+                    <div className="flex justify-between items-start pl-2 gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-800 text-base truncate leading-tight">
                           {drug.brand_name || drug.generic_name}
                         </h3>
-                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-1 truncate">
-                          {drug.generic_name}
-                        </p>
+                        {drug.brand_name && (
+                          <p className="text-xs text-slate-500 mt-0.5 truncate">
+                            {drug.generic_name}
+                          </p>
+                        )}
                       </div>
-                      {isLowStock ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-red-50 text-red-700 border border-red-100 whitespace-nowrap">
-                          Low
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 whitespace-nowrap">
-                          OK
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Stock Display (Centerpiece) */}
-                    <div
-                      className={`rounded-xl p-4 text-center mb-4 transition-colors ${
-                        isLowStock ? "bg-red-50/50" : "bg-slate-50"
-                      }`}
-                    >
-                      <p className="text-xs text-slate-500 font-medium mb-1">
-                        Available Stock
-                      </p>
-                      <div className="flex items-baseline justify-center gap-1">
-                        <span
-                          className={`text-3xl font-extrabold tracking-tight ${
-                            isLowStock ? "text-red-600" : "text-slate-800"
-                          }`}
-                        >
-                          {drug.total_stock ?? 0}
-                        </span>
-                        <span className="text-xs font-semibold text-slate-400 uppercase">
-                          {drug.uom}
-                        </span>
+                      <div className="shrink-0">
+                        {isLowStock ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-100 uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>{" "}
+                            Low
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{" "}
+                            OK
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    {/* Details Grid */}
-                    <div className="mt-auto space-y-2.5">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-                            />
-                          </svg>
-                          <span className="font-medium text-xs">NDC</span>
-                        </div>
-                        <span className="font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded text-xs">
+                    {/* Meta info: NDC & Location */}
+                    <div className="pl-2 flex items-center justify-between text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-[10px] uppercase tracking-wider text-slate-400">
+                          NDC
+                        </span>
+                        <span className="font-mono font-medium text-slate-700">
                           {drug.ndc}
                         </span>
                       </div>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
-                          <span className="font-medium text-xs">Location</span>
-                        </div>
-                        <span className="text-slate-700 font-medium text-xs">
+                      <div className="flex flex-col text-right">
+                        <span className="font-medium text-[10px] uppercase tracking-wider text-slate-400">
+                          Location
+                        </span>
+                        <span className="font-medium text-slate-700">
                           {drug.location || "—"}
                         </span>
                       </div>
+                    </div>
 
-                      <div className="pt-3 mt-2 border-t border-slate-100 flex justify-between items-center text-xs">
-                        <span className="text-slate-400">Min. Level</span>
-                        <span className="font-semibold text-slate-700">
-                          {drug.min_stock_level}
+                    {/* Footer: Stock Levels */}
+                    <div className="pl-2 flex items-end justify-between mt-1">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-500 mb-0.5">
+                          Current Stock
                         </span>
+                        <div className="flex items-baseline gap-1">
+                          <span
+                            className={`text-2xl font-extrabold tracking-tight leading-none ${isLowStock ? "text-red-600" : "text-slate-800"}`}
+                          >
+                            {drug.total_stock ?? 0}
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-400 uppercase">
+                            {drug.uom}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-slate-400">
+                          Min Threshold
+                        </span>
+                        <p className="font-semibold text-slate-700 text-sm">
+                          {drug.min_stock_level}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -516,69 +521,163 @@ function InventoryComponent() {
               })}
             </div>
 
-            {/* Footer / Pagination */}
-            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-slate-200 mt-2 gap-4">
-              <p className="text-sm text-slate-500">
-                Showing{" "}
-                <span className="font-medium text-slate-900">
-                  {inventory.length}
-                </span>{" "}
-                results
-              </p>
-
-              <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                  aria-label="Previous Page"
-                >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </button>
-
-                <div className="px-4 text-sm font-medium text-slate-700 border-x border-slate-100">
-                  <span className="text-indigo-600">{currentPage}</span>
-                  <span className="text-slate-400 mx-1">/</span>
-                  <span>{totalPages}</span>
-                </div>
-
-                <button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                  aria-label="Next Page"
-                >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
+            {/* --- DESKTOP VIEW: TABLE (Hidden on mobile screens) --- */}
+            <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                    <tr>
+                      <th scope="col" className="px-6 py-4">
+                        Drug Information
+                      </th>
+                      <th scope="col" className="px-6 py-4">
+                        NDC
+                      </th>
+                      <th scope="col" className="px-6 py-4">
+                        Location
+                      </th>
+                      <th scope="col" className="px-6 py-4">
+                        Status
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-right">
+                        Stock Level
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {inventory.map((drug) => {
+                      const isLowStock =
+                        drug.total_stock <= drug.min_stock_level;
+                      return (
+                        <tr
+                          key={`desk-${drug.id}`}
+                          className="hover:bg-slate-50/80 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800 text-base">
+                                {drug.brand_name || drug.generic_name}
+                              </span>
+                              {drug.brand_name && (
+                                <span className="text-xs text-slate-500 mt-0.5">
+                                  {drug.generic_name}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded text-xs font-medium border border-slate-200">
+                              {drug.ndc}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-slate-600 font-medium">
+                              {drug.location || "—"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {isLowStock ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                Low Stock
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Adequate
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex flex-col items-end">
+                              <div className="flex items-baseline gap-1">
+                                <span
+                                  className={`text-lg font-extrabold tracking-tight ${isLowStock ? "text-red-600" : "text-slate-800"}`}
+                                >
+                                  {drug.total_stock ?? 0}
+                                </span>
+                                <span className="text-xs font-semibold text-slate-400 uppercase">
+                                  {drug.uom}
+                                </span>
+                              </div>
+                              <span className="text-xs text-slate-400 mt-0.5">
+                                Min: {drug.min_stock_level}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </>
+          </div>
+        )}
+
+        {/* Footer / Pagination (Only shown if there's inventory) */}
+        {inventory.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between pt-2 gap-4">
+            <p className="text-sm text-slate-500">
+              Showing{" "}
+              <span className="font-medium text-slate-900">
+                {inventory.length}
+              </span>{" "}
+              results
+            </p>
+
+            <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                aria-label="Previous Page"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <div className="px-4 text-sm font-medium text-slate-700 border-x border-slate-100">
+                <span className="text-indigo-600">{currentPage}</span>
+                <span className="text-slate-400 mx-1">/</span>
+                <span>{totalPages}</span>
+              </div>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                aria-label="Next Page"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

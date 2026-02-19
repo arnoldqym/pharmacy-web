@@ -6,6 +6,7 @@
     "module": "ESNext",
     "jsx": "react-jsx", // <--- Add or change this line
     "moduleResolution": "Bundler",
+    //"moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
