@@ -3,8 +3,6 @@ import {
   Search,
   ShoppingCart,
   User,
-  ChevronDown,
-  Globe,
   Menu,
   X,
 } from "lucide-react";
@@ -12,10 +10,7 @@ import {
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLangOpen, setIsLangOpen] = useState(false);
 
-  // Refs for outside click detection
-  const langRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -26,14 +21,9 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdowns when clicking outside
+  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Close language dropdown if click outside
-      if (langRef.current && !langRef.current.contains(event.target as Node)) {
-        setIsLangOpen(false);
-      }
-      // Close mobile menu if click outside (except the menu button)
       if (
         mobileMenuRef.current &&
         !mobileMenuRef.current.contains(event.target as Node) &&
@@ -59,32 +49,45 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  // Smooth scroll to section
+  const scrollToSection = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string
+  ) => {
+    e.preventDefault();
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+      // Update URL hash without jumping
+      history.pushState(null, "", `#${sectionId}`);
+    }
+    setIsMobileMenuOpen(false); // Close mobile menu after click
+  };
+
+  // Navigation links – point to section IDs
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
-    {
-      name: "Others",
-      submenu: [
-        { name: "Services", href: "/services" },
-        { name: "FAQs", href: "/faq" },
-        { name: "Dashboard", href: "/dashboard" },
-      ],
-    },
-    { name: "About", href: "/about" },
+    { name: "Home", sectionId: "home" },
+    { name: "Dashboard", sectionId: "dashboard" },
+    { name: "Pricing", sectionId: "pricing" },
+    { name: "About", sectionId: "about" },
   ];
 
   return (
     <>
       <header
-        className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
-          ? 'top-0 py-2'
-          : 'top-4 py-4'
-          }`}
+        className={`fixed w-full z-50 transition-all duration-500 ${
+          isScrolled ? "top-0 py-2" : "top-4 py-4"
+        }`}
       >
         <div className="max-w-350 mx-auto px-4 sm:px-6">
           <nav className="flex items-center justify-between bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-2.5 border border-teal-50 shadow-lg shadow-teal-100/20">
-            {/* Logo */}
-            <a href="/" className="shrink-0" aria-label="Home">
+            {/* Logo – scrolls to top */}
+            <a
+              href="#home"
+              onClick={(e) => scrollToSection(e, "home")}
+              className="shrink-0"
+              aria-label="Home"
+            >
               <div className="text-2xl font-bold bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                 Pharma<span className="text-gray-800">Care</span>
               </div>
@@ -93,36 +96,19 @@ export default function Navbar() {
             {/* Desktop Navigation */}
             <ul className="hidden lg:flex items-center gap-1 xl:gap-2">
               {navLinks.map((link) => (
-                <li key={link.name} className="relative group">
+                <li key={link.name}>
                   <a
-                    href={link.href}
-                    className="flex items-center gap-1 px-3 py-2 text-slate-600 font-medium hover:text-teal-600 transition-colors rounded-lg text-sm xl:text-base"
+                    href={`#${link.sectionId}`}
+                    onClick={(e) => scrollToSection(e, link.sectionId)}
+                    className="block px-3 py-2 text-slate-600 font-medium hover:text-teal-600 transition-colors rounded-lg text-sm xl:text-base"
                   >
                     {link.name}
-                    {link.submenu && (
-                      <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform duration-200" />
-                    )}
                   </a>
-
-                  {/* Dropdown */}
-                  {link.submenu && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-teal-50 shadow-xl rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      {link.submenu.map((sub) => (
-                        <a
-                          key={sub.name}
-                          href={sub.href}
-                          className="block px-4 py-2.5 text-sm text-slate-600 hover:bg-teal-50 hover:text-teal-700 first:rounded-t-xl last:rounded-b-xl transition-colors"
-                        >
-                          {sub.name}
-                        </a>
-                      ))}
-                    </div>
-                  )}
                 </li>
               ))}
             </ul>
 
-            {/* Right Section: Icons + Contact + Language */}
+            {/* Right Section: Icons + Contact */}
             <div className="flex items-center gap-2 lg:gap-4">
               {/* Icons */}
               <div className="flex items-center gap-3 text-slate-500 pr-3 border-r border-slate-200">
@@ -151,10 +137,11 @@ export default function Navbar() {
                 </a>
               </div>
 
-              {/* Contact & Language */}
+              {/* Contact Button */}
               <div className="hidden md:flex items-center gap-3">
                 <a
-                  href="/contact"
+                  href="#contact"
+                  onClick={(e) => scrollToSection(e, "contact")}
                   className="bg-teal-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-teal-700 transition-all shadow-sm hover:shadow-md"
                 >
                   Contact Us
@@ -197,32 +184,35 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <a
                 key={link.name}
-                href={link.href}
+                href={`#${link.sectionId}`}
+                onClick={(e) => scrollToSection(e, link.sectionId)}
                 className="block py-3 text-lg font-medium text-slate-700 border-b border-slate-100 hover:text-teal-600 transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}
               </a>
             ))}
+            {/* Additional mobile‑only contact link */}
+            <a
+              href="#contact"
+              onClick={(e) => scrollToSection(e, "contact")}
+              className="block py-3 text-lg font-medium text-slate-700 border-b border-slate-100 hover:text-teal-600 transition-colors"
+            >
+              Contact
+            </a>
           </div>
           <div className="mt-6 space-y-3">
             <a
-              href="/contact"
-              className="block w-full bg-teal-600 text-white text-center py-3 rounded-xl font-semibold hover:bg-teal-700 transition-colors shadow-sm"
+              href="/login"
+              className="block w-full border border-teal-600 text-teal-600 text-center py-3 rounded-xl font-semibold hover:bg-teal-50 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Contact Us
+              Log in
             </a>
             <div className="flex items-center justify-center gap-4 pt-2">
               <a
-                href="/login"
-                className="text-slate-500 hover:text-teal-600 p-2"
-              >
-                <User size={20} />
-              </a>
-              <a
                 href="/cart"
                 className="text-slate-500 hover:text-teal-600 p-2 relative"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 <ShoppingCart size={20} />
                 <span className="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
