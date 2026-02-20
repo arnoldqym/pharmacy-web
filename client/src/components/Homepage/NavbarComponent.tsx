@@ -67,9 +67,9 @@ export default function Navbar() {
   // Navigation links – point to section IDs
   const navLinks = [
     { name: "Home", sectionId: "home" },
-    { name: "Dashboard", sectionId: "dashboard" },
     { name: "Pricing", sectionId: "pricing" },
     { name: "About", sectionId: "about" },
+    { name: "Demo", sectionId: "demo" },
   ];
 
   return (
