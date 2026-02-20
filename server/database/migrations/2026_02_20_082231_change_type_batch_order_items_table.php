@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->renameColumn('batch_id', 'batch_no');
+            //$table->renameColumn('batch_id', 'batch_no');
             $table->string('batch_no')->change();
         });
     }
@@ -19,7 +19,7 @@ return new class extends Migration {
     public function down()
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->renameColumn('batch_no', 'batch_id');
+            $table->integer('batch_no')->change();
         });
     }
 };
