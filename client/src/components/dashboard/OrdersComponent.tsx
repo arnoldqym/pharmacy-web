@@ -1,38 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import type {
-  OrderItem,
-  Order,
-  CreateOrderPayload,
-} from "../../types/index.dt";
-// // --- Interfaces ---
-// interface OrderItem {
-//   id: number;
-//   drug_id: number;
-//   batch_id: number;
-//   quantity: number;
-//   unit_price: string | number;
-//   subtotal: string | number;
-// }
-
-// interface Order {
-//   id: number;
-//   order_number: string;
-//   status: "pending" | "completed" | "cancelled";
-//   total_amount: string | number;
-//   notes?: string;
-//   created_at: string;
-//   items?: OrderItem[];
-// }
-
-// interface CreateOrderPayload {
-//   items: Array<{
-//     drug_id: number;
-//     batch_no: number | string;
-//     quantity: number;
-//   }>;
-//   notes?: string;
-// }
+import type { Order, CreateOrderPayload } from "../../types/index.dt";
 
 const OrdersComponent: React.FC = () => {
   // Use the interface to type the state
