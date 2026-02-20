@@ -24,7 +24,7 @@ interface Order {
 interface CreateOrderPayload {
   items: Array<{
     drug_id: number;
-    batch_id: number;
+    batch_no: number | string;
     quantity: number;
   }>;
   notes?: string;
@@ -66,8 +66,8 @@ const OrdersComponent: React.FC = () => {
   const handleCreateOrder = async (): Promise<void> => {
     try {
       const payload: CreateOrderPayload = {
-        items: [{ drug_id: 1, batch_id: 1, quantity: 5 }],
-        notes: "Urgent pharmacy restock",
+        items: [{ drug_id: 2, batch_no: "B2201A", quantity: 5 }],
+        notes: "Dispensing test order for Jane Doe",
       };
 
       const response = await axios.post<{ message: string; order: Order }>(
