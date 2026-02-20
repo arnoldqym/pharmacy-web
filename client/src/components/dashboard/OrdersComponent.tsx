@@ -1,34 +1,38 @@
 import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
+import type {
+  OrderItem,
+  Order,
+  CreateOrderPayload,
+} from "../../types/index.dt";
+// // --- Interfaces ---
+// interface OrderItem {
+//   id: number;
+//   drug_id: number;
+//   batch_id: number;
+//   quantity: number;
+//   unit_price: string | number;
+//   subtotal: string | number;
+// }
 
-// --- Interfaces ---
-interface OrderItem {
-  id: number;
-  drug_id: number;
-  batch_id: number;
-  quantity: number;
-  unit_price: string | number;
-  subtotal: string | number;
-}
+// interface Order {
+//   id: number;
+//   order_number: string;
+//   status: "pending" | "completed" | "cancelled";
+//   total_amount: string | number;
+//   notes?: string;
+//   created_at: string;
+//   items?: OrderItem[];
+// }
 
-interface Order {
-  id: number;
-  order_number: string;
-  status: "pending" | "completed" | "cancelled";
-  total_amount: string | number;
-  notes?: string;
-  created_at: string;
-  items?: OrderItem[];
-}
-
-interface CreateOrderPayload {
-  items: Array<{
-    drug_id: number;
-    batch_no: number | string;
-    quantity: number;
-  }>;
-  notes?: string;
-}
+// interface CreateOrderPayload {
+//   items: Array<{
+//     drug_id: number;
+//     batch_no: number | string;
+//     quantity: number;
+//   }>;
+//   notes?: string;
+// }
 
 const OrdersComponent: React.FC = () => {
   // Use the interface to type the state
@@ -105,6 +109,8 @@ const OrdersComponent: React.FC = () => {
         </button>
       </div>
 
+      <div>search bar.</div>
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <div className="overflow-x-auto">
@@ -142,7 +148,7 @@ const OrdersComponent: React.FC = () => {
                     {order.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm font-semibold">
+                <td className="px-4 py-3 text-sm font-semibold text-green-800">
                   ${order.total_amount}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-600">
