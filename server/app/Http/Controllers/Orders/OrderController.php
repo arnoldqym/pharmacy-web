@@ -63,7 +63,7 @@ class OrderController extends Controller
 
                     $order->items()->create([
                         'drug_id' => $item['drug_id'],
-                        'batch_id' => $item['batch_no'],
+                        'batch_no' => $item['batch_no'],
                         'quantity' => $item['quantity'],
                         'unit_price' => $batch->drug->selling_price,
                         'subtotal' => $subtotal,

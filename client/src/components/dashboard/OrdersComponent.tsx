@@ -67,7 +67,7 @@ const OrdersComponent: React.FC = () => {
     try {
       const payload: CreateOrderPayload = {
         items: [{ drug_id: 2, batch_id: "B2201A", quantity: 5 }],
-        notes: "Urgent pharmacy restock",
+        notes: "Dispensing test order for Jane Doe",
       };
 
       const response = await axios.post<{ message: string; order: Order }>(
