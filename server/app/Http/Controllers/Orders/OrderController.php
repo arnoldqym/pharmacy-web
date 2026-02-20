@@ -29,7 +29,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'items' => 'required|array|min:1',
             'items.*.drug_id' => 'required|exists:drugs,id',
-            'items.*.batch_id' => 'required|exists:batches,id',
+            'items.*.batch_no' => 'required|exists:batches,batch_no',
             'items.*.quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string',
         ]);
@@ -50,7 +50,8 @@ class OrderController extends Controller
 
                 // 4. Create Order Items and update stock
                 foreach ($validated['items'] as $item) {
-                    $batch = Batch::findOrFail($item['batch_id']);
+                    $batch = Batch::where('batch_no', $item['batch_no'])->firstOrFail();
+
 
                     // Logic check: Is there enough stock?
                     if ($batch->quantity < $item['quantity']) {
@@ -62,7 +63,7 @@ class OrderController extends Controller
 
                     $order->items()->create([
                         'drug_id' => $item['drug_id'],
-                        'batch_id' => $item['batch_id'],
+                        'batch_id' => $item['batch_no'],
                         'quantity' => $item['quantity'],
                         'unit_price' => $batch->drug->selling_price,
                         'subtotal' => $subtotal,
