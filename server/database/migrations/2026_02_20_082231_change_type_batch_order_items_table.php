@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::table('order_items', function (Blueprint $table) {
             //$table->renameColumn('batch_id', 'batch_no');
+            $table->dropForeign(['batch_id']);
             $table->string('batch_no')->change();
         });
     }
