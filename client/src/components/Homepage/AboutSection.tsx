@@ -45,7 +45,7 @@ const certifications = [
 
 export default function AboutSection() {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 bg-white relative overflow-hidden">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 relative overflow-hidden">
       {/* Decorative background elements – organic feel */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-teal-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/3 translate-y-1/3"></div>
@@ -81,7 +81,7 @@ export default function AboutSection() {
               className="group relative bg-white rounded-2xl p-5 shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
             >
               {/* Gradient background that appears on hover */}
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${member.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+              <div className={`absolute inset-0 rounded-2xl bg-linear-to-br ${member.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
               
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
