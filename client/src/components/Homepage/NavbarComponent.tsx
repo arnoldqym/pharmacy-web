@@ -5,6 +5,7 @@ import {
   User,
   Menu,
   X,
+  LayoutDashboardIcon,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -52,7 +53,7 @@ export default function Navbar() {
   // Smooth scroll to section
   const scrollToSection = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    sectionId: string
+    sectionId: string,
   ) => {
     e.preventDefault();
     const section = document.getElementById(sectionId);
@@ -127,6 +128,13 @@ export default function Navbar() {
                   <span className="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm">
                     0
                   </span>
+                </a>
+                <a
+                  href="/dashboard"
+                  className="text-slate-600 hover:text-teal-600 transition-colors p-1"
+                  aria-label="dashboard"
+                >
+                  <LayoutDashboardIcon size={20} />
                 </a>
                 <a
                   href="/login"
