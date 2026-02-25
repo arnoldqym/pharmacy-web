@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios, { AxiosError } from "axios";
+
 // Types based on your backend responses
 interface Drug {
   id: number;
@@ -54,6 +55,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const [notes, setNotes] = useState("");
 
   const searchTimeout = useRef<number | undefined>(undefined);
+
   // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
@@ -92,7 +94,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
     setLoading(true);
     try {
       const response = await axios.get<SearchResponse>(
-        `${Api_url}/drugs/fetch-specific`,
+        `${Api_url}/specific-drug`,
         {
           params: { query: searchTerm },
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -153,7 +155,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
   // Helper to render search results
   const renderResults = () => {
-    if (loading) return <div className="text-center py-4">Searching...</div>;
+    if (loading)
+      return <div className="text-center py-4 text-gray-600">Searching...</div>;
 
     if (searchResults.type === "none") {
       return (
@@ -166,21 +169,21 @@ const OrderForm: React.FC<OrderFormProps> = ({
     if (searchResults.type === "drugs") {
       const drugs = searchResults.data as Drug[];
       return (
-        <div className="space-y-4 max-h-80 overflow-y-auto">
+        <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
           {drugs.map((drug) => (
-            <div key={drug.id} className="border rounded p-3">
-              <div className="font-semibold">
+            <div key={drug.id} className="border rounded-lg p-3 shadow-sm">
+              <div className="font-semibold text-gray-800">
                 {drug.brand_name} ({drug.generic_name}) – {drug.strength}
               </div>
               <div className="ml-2 mt-2 space-y-1">
                 {drug.batches.map((batch) => (
                   <label
                     key={batch.id}
-                    className={`flex items-center p-2 rounded cursor-pointer ${
+                    className={`flex items-center p-2 rounded-md cursor-pointer transition-colors ${
                       selectedDrugId === drug.id &&
                       selectedBatchNo === batch.batch_no
-                        ? "bg-blue-100 border-blue-400"
-                        : "hover:bg-gray-100"
+                        ? "bg-yellow-100 text-yellow-800 border border-yellow-400"
+                        : "hover:bg-gray-100 text-gray-700"
                     }`}
                   >
                     <input
@@ -194,12 +197,26 @@ const OrderForm: React.FC<OrderFormProps> = ({
                       onChange={() =>
                         handleSelectBatch(drug.id, batch.batch_no)
                       }
-                      className="mr-2"
+                      className="mr-2 accent-yellow-600"
                     />
-                    <span>
-                      Batch: {batch.batch_no} | Exp:{" "}
-                      {new Date(batch.expiry_date).toLocaleDateString()} |
-                      Stock: {batch.quantity}
+                    <span className="flex flex-wrap items-center gap-x-2">
+                      <span>Batch: {batch.batch_no}</span>
+                      <span>
+                        | Exp:{" "}
+                        {new Date(batch.expiry_date).toLocaleDateString()}
+                      </span>
+                      <span className="inline-flex items-center">
+                        | Stock:
+                        <span
+                          className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                            batch.quantity > 0
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {batch.quantity}
+                        </span>
+                      </span>
                     </span>
                   </label>
                 ))}
@@ -213,15 +230,15 @@ const OrderForm: React.FC<OrderFormProps> = ({
     if (searchResults.type === "batches") {
       const batches = searchResults.data as Batch[];
       return (
-        <div className="space-y-2 max-h-80 overflow-y-auto">
+        <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
           {batches.map((batch) => (
             <label
               key={batch.id}
-              className={`flex items-center p-3 border rounded cursor-pointer ${
+              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
                 selectedDrugId === batch.drug?.id &&
                 selectedBatchNo === batch.batch_no
-                  ? "bg-blue-100 border-blue-400"
-                  : "hover:bg-gray-100"
+                  ? "bg-yellow-100 text-yellow-800 border-yellow-400"
+                  : "hover:bg-gray-100 text-gray-700 border-gray-200"
               }`}
             >
               <input
@@ -235,16 +252,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
                 onChange={() =>
                   handleSelectBatch(batch.drug!.id, batch.batch_no)
                 }
-                className="mr-2"
+                className="mr-2 accent-yellow-600"
               />
-              <div>
-                <div className="font-medium">
+              <div className="flex-1">
+                <div className="font-medium text-gray-800">
                   {batch.drug?.brand_name} ({batch.drug?.generic_name})
                 </div>
-                <div className="text-sm text-gray-600">
-                  Batch: {batch.batch_no} | Exp:{" "}
-                  {new Date(batch.expiry_date).toLocaleDateString()} | Stock:{" "}
-                  {batch.quantity}
+                <div className="text-sm text-gray-600 flex flex-wrap items-center gap-x-2">
+                  <span>Batch: {batch.batch_no}</span>
+                  <span>
+                    | Exp: {new Date(batch.expiry_date).toLocaleDateString()}
+                  </span>
+                  <span className="inline-flex items-center">
+                    | Stock:
+                    <span
+                      className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                        batch.quantity > 0
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {batch.quantity}
+                    </span>
+                  </span>
                 </div>
               </div>
             </label>
@@ -257,13 +287,15 @@ const OrderForm: React.FC<OrderFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center border-b p-4">
-          <h3 className="text-xl font-semibold">Create New Order</h3>
+          <h3 className="text-xl font-semibold text-gray-800">
+            Create New Order
+          </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 transition-colors"
           >
             ✕
           </button>
@@ -284,7 +316,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Type drug name or batch number..."
-              className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-shadow text-gray-800"
               autoFocus
             />
           </div>
@@ -308,7 +340,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-gray-800"
                 />
               </div>
               <div>
@@ -323,7 +355,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-gray-800"
                 />
               </div>
             </div>
@@ -334,7 +366,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
               disabled={submitting}
             >
               Cancel
@@ -342,7 +374,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             <button
               type="submit"
               disabled={!selectedDrugId || !selectedBatchNo || submitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
             >
               {submitting ? "Creating..." : "Create Order"}
             </button>
