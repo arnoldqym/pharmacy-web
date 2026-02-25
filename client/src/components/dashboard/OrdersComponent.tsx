@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
+import OrderForm from "./microcomponent/OrderForm";
 import type { Order, CreateOrderPayload } from "../../types/index.dt";
 
 const OrdersComponent: React.FC = () => {
@@ -7,6 +8,7 @@ const OrdersComponent: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
 
   const Api_url =
     (import.meta.env.VITE_BASE_API_URL as string) ||
@@ -63,8 +65,11 @@ const OrdersComponent: React.FC = () => {
     }
   };
 
-  const handleneworder = async (): Promise<void> => {
-    console.log("new order has been clicked");
+  const handleOrderCreated = () => {
+    fetchOrders(); // your existing function to refresh orders
+  };
+  const handleNewOrder = () => {
+    setIsOrderFormOpen(true);
   };
 
   if (loading) return <div className="p-4">Loading orders...</div>;
@@ -80,11 +85,17 @@ const OrdersComponent: React.FC = () => {
           New Test Order
         </button>
         <button
-          onClick={() => handleneworder()}
+          onClick={handleNewOrder}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
           New order
         </button>
+
+        <OrderForm
+          isOpen={isOrderFormOpen}
+          onClose={() => setIsOrderFormOpen(false)}
+          onOrderCreated={handleOrderCreated}
+        />
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
