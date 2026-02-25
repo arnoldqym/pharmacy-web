@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
 use App\Models\Batch;
+use App\Models\Drug;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
 
 class OrderController extends Controller
 {
@@ -87,5 +89,64 @@ class OrderController extends Controller
                 'message' => 'Order failed: ' . $e->getMessage()
             ], 422);
         }
+    }
+
+    public function fetchSpecificDrug(Request $request): JsonResponse
+    {
+        // Enable query log for debugging
+        \DB::enableQueryLog();
+
+        // 1. Validate & Sanitize
+        $validated = $request->validate([
+            'query' => 'required|string|min:2'
+        ]);
+
+        $searchTerm = $validated['query'];
+
+        // 2. Search Drugs by generic or brand name
+        $drugs = Drug::query()
+            ->where('generic_name', 'like', "%{$searchTerm}%")
+            ->orWhere('brand_name', 'like', "%{$searchTerm}%")
+            ->with('batches') // eager load batches for each drug
+            ->limit(10)
+            ->get();
+
+        // 3. Search Batches by batch number (only if no drugs found)
+        $batches = collect(); // empty collection by default
+        if ($drugs->isEmpty()) {
+            $batches = Batch::query()
+                ->where('batch_no', 'like', "%{$searchTerm}%")
+                ->with('drug') // eager load the parent drug
+                ->limit(10)
+                ->get();
+        }
+
+        // 4. Build response based on what was found
+        $response = [
+            'meta' => [
+                'search_term' => $searchTerm
+            ],
+            'debug_queries' => \DB::getQueryLog()
+        ];
+
+        if ($drugs->isNotEmpty()) {
+            $response['results'] = [
+                'type' => 'drugs',
+                'data' => $drugs
+            ];
+        } elseif ($batches->isNotEmpty()) {
+            $response['results'] = [
+                'type' => 'batches',
+                'data' => $batches
+            ];
+        } else {
+            // No results at all
+            $response['results'] = [
+                'type' => 'none',
+                'data' => []
+            ];
+        }
+
+        return response()->json($response);
     }
 }

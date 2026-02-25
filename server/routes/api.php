@@ -44,4 +44,5 @@ Route::middleware('auth:api')->group(function () {
     //process orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/specific-drug', [OrderController::class, 'fetchSpecificDrug'])->name('orders.specific.drug');
 });
