@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Orders;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Batch;
+use App\Models\Drug
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -87,5 +88,22 @@ class OrderController extends Controller
                 'message' => 'Order failed: ' . $e->getMessage()
             ], 422);
         }
+    }
+
+    public function fetchSpecificDrug(Request $request)
+    {
+        $validated = $request->validate(['drug' => 'required|string']);
+        $drug = $validated['drug'];
+
+        $batchItem = Batch::whereHas('drug', function ($query) use ($drug) {
+            $query->where('batch_no', 'like', "%$drug%");
+        })->with('drug')->get();
+
+        $drugItem = Drug::where('generic_name', 'like', "%$drug%")->orWhere('brand_name', 'like', "%$drug%")->with('batches')->get();
+
+        return response()->json([
+            'batches' => $batchItem,
+            'drugs' => $drugItem
+        ]);
     }
 }
