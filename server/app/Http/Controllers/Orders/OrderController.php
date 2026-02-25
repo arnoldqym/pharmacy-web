@@ -93,43 +93,60 @@ class OrderController extends Controller
 
     public function fetchSpecificDrug(Request $request): JsonResponse
     {
+        // Enable query log for debugging
+        \DB::enableQueryLog();
+
         // 1. Validate & Sanitize
         $validated = $request->validate([
-            'query' => 'required|string|min:2' // Don't search for a single character
+            'query' => 'required|string|min:2'
         ]);
 
         $searchTerm = $validated['query'];
 
-        // 2. Search Drugs (Generic or Brand Name)
-        // We limit results to 10 to keep the response snappy.
+        // 2. Search Drugs by generic or brand name
         $drugs = Drug::query()
             ->where('generic_name', 'like', "%{$searchTerm}%")
             ->orWhere('brand_name', 'like', "%{$searchTerm}%")
-            ->with([
-                'batches' => function ($query) {
-                    $query->where('expiry_date', '>', now()); // Optional: only show valid batches
-                }
-            ])
+            ->with('batches') // eager load batches for each drug
             ->limit(10)
             ->get();
 
-        // 3. Search specifically by Batch Number
-        // If the user types a specific batch code, they want that exact item.
-        $batches = Batch::query()
-            ->where('batch_no', 'like', "%{$searchTerm}%")
-            ->with('drug')
-            ->limit(10)
-            ->get();
+        // 3. Search Batches by batch number (only if no drugs found)
+        $batches = collect(); // empty collection by default
+        if ($drugs->isEmpty()) {
+            $batches = Batch::query()
+                ->where('batch_no', 'like', "%{$searchTerm}%")
+                ->with('drug') // eager load the parent drug
+                ->limit(10)
+                ->get();
+        }
 
-        // 4. Return a structured response
-        return response()->json([
-            'results' => [
-                'drugs' => $drugs,
-                'batches' => $batches,
-            ],
+        // 4. Build response based on what was found
+        $response = [
             'meta' => [
-                'search_term' => $searchTerm // Useful for the frontend to verify "freshness"
-            ]
-        ]);
+                'search_term' => $searchTerm
+            ],
+            'debug_queries' => \DB::getQueryLog()
+        ];
+
+        if ($drugs->isNotEmpty()) {
+            $response['results'] = [
+                'type' => 'drugs',
+                'data' => $drugs
+            ];
+        } elseif ($batches->isNotEmpty()) {
+            $response['results'] = [
+                'type' => 'batches',
+                'data' => $batches
+            ];
+        } else {
+            // No results at all
+            $response['results'] = [
+                'type' => 'none',
+                'data' => []
+            ];
+        }
+
+        return response()->json($response);
     }
 }
