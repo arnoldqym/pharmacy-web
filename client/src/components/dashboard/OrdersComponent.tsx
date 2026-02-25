@@ -63,6 +63,10 @@ const OrdersComponent: React.FC = () => {
     }
   };
 
+  const handleneworder = async (): Promise<void> => {
+    console.log("new order has been clicked");
+  };
+
   if (loading) return <div className="p-4">Loading orders...</div>;
 
   return (
@@ -75,9 +79,13 @@ const OrdersComponent: React.FC = () => {
         >
           New Test Order
         </button>
+        <button
+          onClick={() => handleneworder()}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          New order
+        </button>
       </div>
-
-      <div>search bar.</div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
