@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Orders;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
 use App\Models\Batch;
-use App\Models\Drug
+use App\Models\Drug;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
 
 class OrderController extends Controller
 {
@@ -90,20 +91,45 @@ class OrderController extends Controller
         }
     }
 
-    public function fetchSpecificDrug(Request $request)
+    public function fetchSpecificDrug(Request $request): JsonResponse
     {
-        $validated = $request->validate(['drug' => 'required|string']);
-        $drug = $validated['drug'];
+        // 1. Validate & Sanitize
+        $validated = $request->validate([
+            'query' => 'required|string|min:2' // Don't search for a single character
+        ]);
 
-        $batchItem = Batch::whereHas('drug', function ($query) use ($drug) {
-            $query->where('batch_no', 'like', "%$drug%");
-        })->with('drug')->get();
+        $searchTerm = $validated['query'];
 
-        $drugItem = Drug::where('generic_name', 'like', "%$drug%")->orWhere('brand_name', 'like', "%$drug%")->with('batches')->get();
+        // 2. Search Drugs (Generic or Brand Name)
+        // We limit results to 10 to keep the response snappy.
+        $drugs = Drug::query()
+            ->where('generic_name', 'like', "%{$searchTerm}%")
+            ->orWhere('brand_name', 'like', "%{$searchTerm}%")
+            ->with([
+                'batches' => function ($query) {
+                    $query->where('expiry_date', '>', now()); // Optional: only show valid batches
+                }
+            ])
+            ->limit(10)
+            ->get();
 
+        // 3. Search specifically by Batch Number
+        // If the user types a specific batch code, they want that exact item.
+        $batches = Batch::query()
+            ->where('batch_no', 'like', "%{$searchTerm}%")
+            ->with('drug')
+            ->limit(10)
+            ->get();
+
+        // 4. Return a structured response
         return response()->json([
-            'batches' => $batchItem,
-            'drugs' => $drugItem
+            'results' => [
+                'drugs' => $drugs,
+                'batches' => $batches,
+            ],
+            'meta' => [
+                'search_term' => $searchTerm // Useful for the frontend to verify "freshness"
+            ]
         ]);
     }
 }
