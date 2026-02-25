@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios, { AxiosError } from "axios";
-import { Api_url } from "../config"; // adjust to your API base URL
-
 // Types based on your backend responses
 interface Drug {
   id: number;
@@ -45,6 +43,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
   );
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const Api_url =
+    (import.meta.env.VITE_BASE_API_URL as string) ||
+    "http://localhost:8000/api";
 
   // Selection state
   const [selectedDrugId, setSelectedDrugId] = useState<number | null>(null);
@@ -52,8 +53,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const [quantity, setQuantity] = useState<number>(1);
   const [notes, setNotes] = useState("");
 
-  const searchTimeout = useRef<NodeJS.Timeout>();
-
+  const searchTimeout = useRef<number | undefined>(undefined);
   // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
@@ -73,12 +73,19 @@ const OrderForm: React.FC<OrderFormProps> = ({
       return;
     }
 
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => {
+    if (searchTimeout.current !== undefined) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = window.setTimeout(() => {
       performSearch();
     }, 300);
 
-    return () => clearTimeout(searchTimeout.current);
+    return () => {
+      if (searchTimeout.current !== undefined) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
   }, [searchTerm]);
 
   const performSearch = async () => {
