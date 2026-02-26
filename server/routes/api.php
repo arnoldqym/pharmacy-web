@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Inventory\InventoryController;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\Overview\OverviewController;
+use App\Http\Controllers\Patient\PatientController;
 use App\Http\Controllers\Upload\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -45,4 +46,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/specific-drug', [OrderController::class, 'fetchSpecificDrug'])->name('orders.specific.drug');
+    Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
 });
