@@ -102,8 +102,10 @@ export interface OrderItem {
   drug_id: number;
   batch_id: number;
   quantity: number;
+  batch_no: string | null;
   unit_price: string | number;
   subtotal: string | number;
+  drug: Drug;
 }
 
 export interface Order {
@@ -111,8 +113,11 @@ export interface Order {
   order_number: string;
   status: "pending" | "completed" | "cancelled";
   total_amount: string | number;
-  notes?: string;
+  notes?: string | null;
   created_at: string;
+  updated_at: string;
+  patient_id: number;
+  patient: Patient;
   items?: OrderItem[];
 }
 
@@ -123,4 +128,13 @@ export interface CreateOrderPayload {
     quantity: number;
   }>;
   notes?: string;
+}
+
+//patient interface
+export interface Patient {
+  id: number;
+  name: string;
+  phone: string;
+  email: string | null;
+  // ... other fields
 }
