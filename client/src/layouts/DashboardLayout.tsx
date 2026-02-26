@@ -9,6 +9,8 @@ import {
   X,
   Upload,
   Home,
+  CreditCard,
+  User2,
 } from "lucide-react";
 import { Navigate, NavLink } from "react-router-dom";
 
@@ -144,6 +146,46 @@ function DashboardLayout({
                   }`}
                 />
                 <span>Orders</span>
+              </div>
+            )}
+          </NavLink>
+
+          <NavLink to="/dashboard/patient" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <User2
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Patient Dashboard</span>
+              </div>
+            )}
+          </NavLink>
+
+          <NavLink to="/dashboard/checkout" className="block">
+            {({ isActive }) => (
+              <div
+                className={`flex items-center space-x-3 py-2.5 px-4 rounded-xl font-medium transition-all duration-200 group ${
+                  isActive
+                    ? "bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100/80 hover:text-gray-900"
+                }`}
+              >
+                <CreditCard
+                  size={20}
+                  className={`transition-transform group-hover:scale-110 ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
+                />
+                <span>Checkout</span>
               </div>
             )}
           </NavLink>
