@@ -166,14 +166,14 @@ class OrderController extends Controller
 
     public function fetchPrescriptionsForSpecificPatient(Request $request): JsonResponse
     {
-        // 1. Validate input
+        // 1. Validate 'patientId' (matching your JS)
         $validated = $request->validate([
-            'patient_id' => 'required|exists:patients,id',
+            'patientId' => 'required|exists:patients,id',
         ]);
 
-        // 2. Fetch orders for the given patient
+        // 2. Use the correct key from the validated array
         $prescription = Order::with('items.drug', 'items.batch')
-            ->where('patient_id', $validated['patient_id'])
+            ->where('patient_id', $validated['patientId']) // column name remains 'patient_id'
             ->latest()
             ->get();
 
