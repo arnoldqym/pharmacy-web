@@ -25,7 +25,6 @@ function PrescriptionComponent() {
         },
       });
       const data = await res.json();
-      //console.log("Fetched prescriptions:", data);
       setPrescriptions(data.data || []);
       setSelectedPatient(null);
     } catch (err) {
@@ -43,7 +42,7 @@ function PrescriptionComponent() {
       } else {
         setSearchResults([]);
       }
-    }, 500); // 500ms delay
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
@@ -81,7 +80,7 @@ function PrescriptionComponent() {
         },
       );
       const data = await res.json();
-      // If it's also paginated, use data.data; if it's a plain array, just use data
+      // Adjust based on actual response structure
       setPrescriptions(Array.isArray(data) ? data : data.data || []);
     } catch (err) {
       console.error("Error fetching patient prescriptions:", err);
@@ -90,8 +89,25 @@ function PrescriptionComponent() {
     }
   };
 
+  // Helper to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "—";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Helper to summarize items
+  const getItemsSummary = (items) => {
+    if (!items || items.length === 0) return "—";
+    return `${items.length} item(s)`;
+  };
+
   return (
-    <div className="max-w-6xl mx-auto p-4 font-sans">
+    <div className="max-w-7xl mx-auto p-4 font-sans">
       <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-800">
           {selectedPatient
@@ -103,7 +119,7 @@ function PrescriptionComponent() {
         <div className="relative w-full md:w-80">
           <input
             type="text"
-            placeholder="Search patients..."
+            placeholder="Search patients by name or phone..."
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -119,7 +135,9 @@ function PrescriptionComponent() {
                   className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-none transition-colors"
                 >
                   <p className="font-medium text-gray-700">{patient.name}</p>
-                  <p className="text-xs text-gray-500">ID: {patient.id}</p>
+                  <p className="text-xs text-gray-500">
+                    Phone: {patient.phone}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -137,43 +155,93 @@ function PrescriptionComponent() {
         </button>
       )}
 
-      {/* Prescription List/Grid */}
+      {/* Prescription Table */}
       {loading ? (
         <div className="flex justify-center p-10">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {prescriptions.length > 0 ? (
-            prescriptions.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded">
-                    {item.date}
-                  </span>
-                </div>
-                <h3 className="font-bold text-lg text-gray-900">
-                  {item.medicationName}
-                </h3>
-                <p className="text-gray-600 text-sm mt-1">{item.dosage}</p>
-                <div className="mt-4 pt-4 border-t border-gray-50">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider">
-                    Instructions
-                  </p>
-                  <p className="text-sm text-gray-700 italic">
-                    "{item.instructions}"
-                  </p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20 text-gray-500">
-              No prescriptions found.
-            </div>
-          )}
+        <div className="overflow-x-auto bg-white rounded-lg shadow">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order #
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Patient
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Items
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Notes
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {prescriptions.length > 0 ? (
+                prescriptions.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {item.order_number}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(item.created_at)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.patient?.name || "—"}
+                      {item.patient?.phone && (
+                        <span className="block text-xs text-gray-400">
+                          {item.patient.phone}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {getItemsSummary(item.items)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      KSh {parseFloat(item.total_amount).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          item.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : item.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                      {item.notes || "—"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="px-6 py-10 text-center text-gray-500"
+                  >
+                    No prescriptions found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
