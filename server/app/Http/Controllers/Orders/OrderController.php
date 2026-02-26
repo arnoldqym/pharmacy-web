@@ -33,6 +33,8 @@ class OrderController extends Controller
             'patient_id' => 'nullable|exists:patients,id',
             'patient_name' => 'required_without:patient_id|string|max:255', // Require name if no ID
             'patient_phone' => 'nullable|string|max:20',
+            'patient_email' => 'nullable|email|max:255',
+            'patient_dob' => 'required|date',
             'items' => 'required|array|min:1',
             'items.*.drug_id' => 'required|exists:drugs,id',
             'items.*.batch_no' => 'required|exists:batches,batch_no',
@@ -49,8 +51,14 @@ class OrderController extends Controller
                 // If no existing ID was sent, but a name was, create a new patient
                 if (!$patientId && isset($validated['patient_name'])) {
                     $patient = Patient::firstOrCreate(
-                        ['phone' => $validated['patient_phone'] ?? null],
-                        ['name' => $validated['patient_name']]
+                        [
+                            'name' => $validated['patient_name'],
+                            'phone' => $validated['patient_phone'] ?? null,
+                        ],
+                        [
+                            'date_of_birth' => $validated['patient_dob'] ?? null,
+                            'email' => $validated['patient_email'] ?? null,
+                        ]
                     );
                     $patientId = $patient->id;
                 }

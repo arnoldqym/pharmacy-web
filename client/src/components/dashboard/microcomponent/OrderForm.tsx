@@ -32,6 +32,8 @@ interface Patient {
   id: number;
   name: string;
   phone: string;
+  dob: string;
+  email: string;
   // add other fields if needed
 }
 
@@ -63,6 +65,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const [patientId, setPatientId] = useState<number | null>(null);
   const [patientName, setPatientName] = useState("");
   const [patientPhone, setPatientPhone] = useState("");
+  const [patientDOB, setPatientDOB] = useState("");
+  const [patientEmail, setPatientEmail] = useState("");
   const [patientSearchTerm, setPatientSearchTerm] = useState("");
   const [patientSearchResults, setPatientSearchResults] = useState<Patient[]>(
     [],
@@ -92,6 +96,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
       setPatientId(null);
       setPatientName("");
       setPatientPhone("");
+      setPatientDOB("");
+      setPatientEmail("");
       setPatientSearchTerm("");
       setPatientSearchResults([]);
     }
@@ -188,6 +194,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
     setPatientId(patient.id);
     setPatientName(patient.name); // for display only
     setPatientPhone(patient.phone); // for display only
+    setPatientDOB(patient.dob); // for display only
+    setPatientEmail(patient.email); // for display only
     setPatientSearchTerm(""); // clear search
     setPatientSearchResults([]);
   };
@@ -207,6 +215,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
       }
       if (!patientPhone.trim()) {
         alert("Please enter patient phone.");
+        return;
+      }
+      if (!patientDOB) {
+        alert("Please enter patient date of birth.");
         return;
       }
     }
@@ -236,6 +248,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
       } else {
         payload.patient_name = patientName.trim();
         payload.patient_phone = patientPhone.trim();
+        payload.patient_email = patientEmail.trim();
+        payload.patient_dob = patientDOB.trim();
       }
 
       await axios.post(`${Api_url}/orders`, payload, {
@@ -435,6 +449,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
                     setPatientMode("existing");
                     setPatientName("");
                     setPatientPhone("");
+                    setPatientDOB("");
+                    setPatientEmail("");
                   }}
                   className="mr-1 accent-green-600"
                 />
@@ -474,6 +490,39 @@ const OrderForm: React.FC<OrderFormProps> = ({
                     id="patientPhone"
                     value={patientPhone}
                     onChange={(e) => setPatientPhone(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    required={patientMode === "new"}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="patientDOB"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Patient DOB *
+                  </label>
+                  <input
+                    type="date"
+                    id="patientDOB"
+                    value={patientDOB}
+                    onChange={(e) => setPatientDOB(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    required={patientMode === "new"}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="patientEmail"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Patient Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="patientEmail"
+                    value={patientEmail}
+                    onChange={(e) => setPatientEmail(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:border-green-400 text-gray-800"
                     required={patientMode === "new"}
                   />
