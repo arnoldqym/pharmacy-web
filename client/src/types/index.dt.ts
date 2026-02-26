@@ -102,17 +102,22 @@ export interface OrderItem {
   drug_id: number;
   batch_id: number;
   quantity: number;
-  unit_price: string | number;
-  subtotal: string | number;
+  batch_no: string | null;
+  unit_price: string;
+  subtotal: string;
+  drug: Drug;
 }
 
 export interface Order {
   id: number;
   order_number: string;
   status: "pending" | "completed" | "cancelled";
-  total_amount: string | number;
-  notes?: string;
+  total_amount: string;
+  notes?: string | null;
   created_at: string;
+  updated_at: string;
+  patient_id: number;
+  patient: Patient;
   items?: OrderItem[];
 }
 
@@ -123,4 +128,13 @@ export interface CreateOrderPayload {
     quantity: number;
   }>;
   notes?: string;
+}
+
+//patient interface
+export interface Patient {
+  id: number;
+  name: string;
+  phone: string;
+  email: string | null;
+  // ... other fields
 }

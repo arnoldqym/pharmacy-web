@@ -27,6 +27,18 @@ interface SearchResponse {
   };
 }
 
+// Patient types for search
+interface Patient {
+  id: number;
+  name: string;
+  phone: string;
+  // add other fields if needed
+}
+
+interface PatientSearchResponse {
+  data: Patient[];
+}
+
 interface OrderFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -48,7 +60,19 @@ const OrderForm: React.FC<OrderFormProps> = ({
     (import.meta.env.VITE_BASE_API_URL as string) ||
     "http://localhost:8000/api";
 
-  // Selection state
+  // Patient state
+  const [patientMode, setPatientMode] = useState<"existing" | "new">("new");
+  const [patientId, setPatientId] = useState<number | null>(null);
+  const [patientName, setPatientName] = useState("");
+  const [patientPhone, setPatientPhone] = useState("");
+  const [patientSearchTerm, setPatientSearchTerm] = useState("");
+  const [patientSearchResults, setPatientSearchResults] = useState<Patient[]>(
+    [],
+  );
+  const [loadingPatients, setLoadingPatients] = useState(false);
+  const patientSearchTimeout = useRef<number | undefined>(undefined);
+
+  // Drug selection state
   const [selectedDrugId, setSelectedDrugId] = useState<number | null>(null);
   const [selectedBatchNo, setSelectedBatchNo] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
@@ -65,10 +89,17 @@ const OrderForm: React.FC<OrderFormProps> = ({
       setSelectedBatchNo(null);
       setQuantity(1);
       setNotes("");
+      // Reset patient fields
+      setPatientMode("new");
+      setPatientId(null);
+      setPatientName("");
+      setPatientPhone("");
+      setPatientSearchTerm("");
+      setPatientSearchResults([]);
     }
   }, [isOpen]);
 
-  // Debounced search
+  // Debounced drug search
   useEffect(() => {
     if (searchTerm.length < 2) {
       setSearchResults({ type: "none", data: [] });
@@ -90,6 +121,28 @@ const OrderForm: React.FC<OrderFormProps> = ({
     };
   }, [searchTerm]);
 
+  // Debounced patient search
+  useEffect(() => {
+    if (patientSearchTerm.length < 2) {
+      setPatientSearchResults([]);
+      return;
+    }
+
+    if (patientSearchTimeout.current !== undefined) {
+      clearTimeout(patientSearchTimeout.current);
+    }
+
+    patientSearchTimeout.current = window.setTimeout(() => {
+      searchPatients();
+    }, 300);
+
+    return () => {
+      if (patientSearchTimeout.current !== undefined) {
+        clearTimeout(patientSearchTimeout.current);
+      }
+    };
+  }, [patientSearchTerm]);
+
   const performSearch = async () => {
     setLoading(true);
     try {
@@ -109,13 +162,58 @@ const OrderForm: React.FC<OrderFormProps> = ({
     }
   };
 
+  const searchPatients = async () => {
+    setLoadingPatients(true);
+    try {
+      const response = await axios.get<PatientSearchResponse>(
+        `${Api_url}/patients/search`,
+        {
+          params: { query: patientSearchTerm },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
+      );
+      setPatientSearchResults(response.data.data);
+    } catch (error) {
+      console.error("Patient search error:", error);
+      setPatientSearchResults([]);
+    } finally {
+      setLoadingPatients(false);
+    }
+  };
+
   const handleSelectBatch = (drugId: number, batchNo: string) => {
     setSelectedDrugId(drugId);
     setSelectedBatchNo(batchNo);
   };
 
+  const handleSelectPatient = (patient: Patient) => {
+    setPatientId(patient.id);
+    setPatientName(patient.name); // for display only
+    setPatientPhone(patient.phone); // for display only
+    setPatientSearchTerm(""); // clear search
+    setPatientSearchResults([]);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate patient info
+    if (patientMode === "existing" && !patientId) {
+      alert("Please select an existing patient.");
+      return;
+    }
+    if (patientMode === "new") {
+      if (!patientName.trim()) {
+        alert("Please enter patient name.");
+        return;
+      }
+      if (!patientPhone.trim()) {
+        alert("Please enter patient phone.");
+        return;
+      }
+    }
+
+    // Validate drug selection
     if (!selectedDrugId || !selectedBatchNo) {
       alert("Please select a batch first.");
       return;
@@ -127,12 +225,20 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
     setSubmitting(true);
     try {
-      const payload = {
+      // Build payload according to controller expectations
+      const payload: any = {
         items: [
           { drug_id: selectedDrugId, batch_no: selectedBatchNo, quantity },
         ],
-        notes: notes || undefined,
       };
+      if (notes) payload.notes = notes;
+
+      if (patientMode === "existing") {
+        payload.patient_id = patientId;
+      } else {
+        payload.patient_name = patientName.trim();
+        payload.patient_phone = patientPhone.trim();
+      }
 
       await axios.post(`${Api_url}/orders`, payload, {
         headers: {
@@ -153,7 +259,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
   if (!isOpen) return null;
 
-  // Helper to render search results
+  // Helper to render search results (drugs/batches) – unchanged
   const renderResults = () => {
     if (loading)
       return <div className="text-center py-4 text-gray-600">Searching...</div>;
@@ -288,8 +394,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-        <div className="flex justify-between items-center border-b p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center border-b p-4 sticky top-0 bg-white">
           <h3 className="text-xl font-semibold text-gray-800">
             Create New Order
           </h3>
@@ -302,7 +408,121 @@ const OrderForm: React.FC<OrderFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-4">
-          {/* Search input */}
+          {/* Patient Section */}
+          <div className="mb-6 border rounded-lg p-4 bg-gray-50">
+            <div className="flex items-center space-x-4 mb-3">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="patientMode"
+                  value="new"
+                  checked={patientMode === "new"}
+                  onChange={() => {
+                    setPatientMode("new");
+                    setPatientId(null);
+                  }}
+                  className="mr-1 accent-green-600"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  New Patient
+                </span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="patientMode"
+                  value="existing"
+                  checked={patientMode === "existing"}
+                  onChange={() => {
+                    setPatientMode("existing");
+                    setPatientName("");
+                    setPatientPhone("");
+                  }}
+                  className="mr-1 accent-green-600"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Existing Patient
+                </span>
+              </label>
+            </div>
+
+            {patientMode === "new" ? (
+              <div className="space-y-3">
+                <div>
+                  <label
+                    htmlFor="patientName"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Patient Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="patientName"
+                    value={patientName}
+                    onChange={(e) => setPatientName(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    required={patientMode === "new"}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="patientPhone"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Patient Phone *
+                  </label>
+                  <input
+                    type="tel"
+                    id="patientPhone"
+                    value={patientPhone}
+                    onChange={(e) => setPatientPhone(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:border-green-400 text-gray-800"
+                    required={patientMode === "new"}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label
+                  htmlFor="patientSearch"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Search Existing Patient
+                </label>
+                <input
+                  type="text"
+                  id="patientSearch"
+                  value={patientSearchTerm}
+                  onChange={(e) => setPatientSearchTerm(e.target.value)}
+                  placeholder="Type name or phone..."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:border-green-400 text-gray-800"
+                />
+                {loadingPatients && (
+                  <div className="text-sm text-gray-500 mt-1">Searching...</div>
+                )}
+                {patientSearchResults.length > 0 && (
+                  <ul className="mt-2 border rounded-lg divide-y max-h-40 overflow-y-auto">
+                    {patientSearchResults.map((patient) => (
+                      <li
+                        key={patient.id}
+                        onClick={() => handleSelectPatient(patient)}
+                        className="p-2 hover:bg-green-50 cursor-pointer text-sm text-gray-800"
+                      >
+                        {patient.name} - {patient.phone}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {patientId && (
+                  <div className="mt-2 p-2 bg-green-100 text-green-800 rounded-lg text-sm">
+                    Selected: {patientName} - {patientPhone}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Drug search section (unchanged) */}
           <div className="mb-4">
             <label
               htmlFor="search"
@@ -317,11 +537,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Type drug name or batch number..."
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-shadow text-gray-800"
-              autoFocus
             />
           </div>
 
-          {/* Search results */}
+          {/* Search results (drugs/batches) */}
           <div className="mb-4">{renderResults()}</div>
 
           {/* Order details (visible only when a batch is selected) */}
@@ -362,7 +581,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           )}
 
           {/* Action buttons */}
-          <div className="flex justify-end space-x-2 mt-6">
+          <div className="flex justify-end space-x-2 mt-6 sticky bottom-0 bg-white py-2 border-t">
             <button
               type="button"
               onClick={onClose}
@@ -373,7 +592,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
             </button>
             <button
               type="submit"
-              disabled={!selectedDrugId || !selectedBatchNo || submitting}
+              disabled={
+                !selectedDrugId ||
+                !selectedBatchNo ||
+                submitting ||
+                (patientMode === "existing" && !patientId) ||
+                (patientMode === "new" && (!patientName || !patientPhone))
+              }
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
             >
               {submitting ? "Creating..." : "Create Order"}
