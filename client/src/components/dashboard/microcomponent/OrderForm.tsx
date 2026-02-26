@@ -35,9 +35,7 @@ interface Patient {
   // add other fields if needed
 }
 
-interface PatientSearchResponse {
-  data: Patient[];
-}
+type PatientSearchResponse = Patient[];
 
 interface OrderFormProps {
   isOpen: boolean;
@@ -172,7 +170,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },
       );
-      setPatientSearchResults(response.data.data);
+      setPatientSearchResults(response.data);
     } catch (error) {
       console.error("Patient search error:", error);
       setPatientSearchResults([]);
@@ -500,8 +498,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
                 {loadingPatients && (
                   <div className="text-sm text-gray-500 mt-1">Searching...</div>
                 )}
-                {patientSearchResults.length > 0 && (
-                  <ul className="mt-2 border rounded-lg divide-y max-h-40 overflow-y-auto">
+                {patientSearchResults?.length > 0 && (
+                  <ul className="mt-2 border rounded-lg divide-y max-h-40 overflow-y-auto bg-white shadow-lg relative z-100">
                     {patientSearchResults.map((patient) => (
                       <li
                         key={patient.id}

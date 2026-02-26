@@ -47,7 +47,7 @@ class PatientController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $query = $request->input('q');
+        $query = $request->input('q') ?? $request->input('query');
         Log::info("ABout to check if : {$query} is in db");
         if (!$query || strlen($query) < 2) {
             return response()->json([]);
