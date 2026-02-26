@@ -42,6 +42,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index');
 
+    //prescriptions fetch
+    Route::get
+
     //process orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');

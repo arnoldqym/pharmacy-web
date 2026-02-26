@@ -163,4 +163,42 @@ class OrderController extends Controller
 
         return response()->json($response);
     }
+
+    public function fetchPrescriptionsForSpecificPatient(Request $request): JsonResponse
+    {
+        // 1. Validate input
+        $validated = $request->validate([
+            'patient_id' => 'required|exists:patients,id',
+        ]);
+
+        // 2. Fetch orders for the given patient
+        $prescription = Order::with('items.drug', 'items.batch')
+            ->where('patient_id', $validated['patient_id'])
+            ->latest()
+            ->get();
+
+        return response()->json($prescription);
+    }
+
+    public function fetchAllPrescriptions(Request $request): JsonResponse
+    {
+        // 1. Authorization: Only allow Admins or Pharmacists
+        // $this->authorize('viewAny', Order::class);
+
+        $prescriptions = Order::query()
+            ->with([
+                'patient:id,first_name,last_name', // Vital to know who the order is for
+                'items.drug:id,name',
+                'items.batch:id,batch_number'
+            ])
+            // 2. Optional Filtering (e.g., ?status=pending)
+            ->when($request->status, function ($query, $status) {
+                return $query->where('status', $status);
+            })
+            // 3. Sorting and Pagination
+            ->latest()
+            ->paginate($request->get('per_page', 20));
+
+        return response()->json($prescriptions);
+    }
 }
