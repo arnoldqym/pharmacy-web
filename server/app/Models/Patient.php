@@ -2,9 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patient extends Model
 {
-    //
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'phone',
+        'email',
+        'date_of_birth',
+    ];
+
+    /**
+     * Get the orders for the patient.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 }
