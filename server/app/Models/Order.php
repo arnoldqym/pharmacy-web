@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
@@ -24,6 +25,7 @@ class Order extends Model
      */
     protected $fillable = [
         'order_number',
+        'patient_id',
         'status',          // e.g., 'pending', 'approved', 'shipped', 'delivered', 'cancelled'
         'total_amount',
         'notes',
@@ -54,5 +56,12 @@ class Order extends Model
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
+    }
+    /**
+     * Get the patient that owns the order.
+     */
+    public function patient(): BelongsTo
+    {
+        return $this->belongsTo(Patient::class);
     }
 }

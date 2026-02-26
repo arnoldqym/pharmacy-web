@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use App\Models\Drug;
 use App\Models\Order;
+use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with('items.drug', 'items.batch')->latest()->get();
+        $orders = Order::with('patient', 'items.drug', 'items.batch')->latest()->get();
         return response()->json($orders);
     }
 
@@ -29,6 +30,9 @@ class OrderController extends Controller
     {
         // 1. Validate the incoming data
         $validated = $request->validate([
+            'patient_id' => 'nullable|exists:patients,id',
+            'patient_name' => 'required_without:patient_id|string|max:255', // Require name if no ID
+            'patient_phone' => 'nullable|string|max:20',
             'items' => 'required|array|min:1',
             'items.*.drug_id' => 'required|exists:drugs,id',
             'items.*.batch_no' => 'required|exists:batches,batch_no',
@@ -37,15 +41,27 @@ class OrderController extends Controller
         ]);
 
         try {
-            // 2. Use a transaction to ensure data integrity
             return DB::transaction(function () use ($validated) {
+
+                // 2. Resolve the Patient
+                $patientId = $validated['patient_id'] ?? null;
+
+                // If no existing ID was sent, but a name was, create a new patient
+                if (!$patientId && isset($validated['patient_name'])) {
+                    $patient = Patient::firstOrCreate(
+                        ['phone' => $validated['patient_phone'] ?? null],
+                        ['name' => $validated['patient_name']]
+                    );
+                    $patientId = $patient->id;
+                }
 
                 // 3. Create the Parent Order
                 $order = Order::create([
+                    'patient_id' => $patientId, // <-- Attach patient
                     'order_number' => 'ORD-' . strtoupper(Str::random(8)),
                     'status' => 'pending',
                     'notes' => $validated['notes'] ?? null,
-                    'total_amount' => 0, // Will update this after calculating items
+                    'total_amount' => 0,
                 ]);
 
                 $totalAmount = 0;
@@ -54,8 +70,6 @@ class OrderController extends Controller
                 foreach ($validated['items'] as $item) {
                     $batch = Batch::where('batch_no', $item['batch_no'])->firstOrFail();
 
-
-                    // Logic check: Is there enough stock?
                     if ($batch->quantity < $item['quantity']) {
                         throw new \Exception("Insufficient stock for batch: {$batch->batch_no}");
                     }
@@ -80,7 +94,7 @@ class OrderController extends Controller
 
                 return response()->json([
                     'message' => 'Order created successfully!',
-                    'order' => $order->load('items')
+                    'order' => $order->load('patient', 'items') // <-- Load patient in response
                 ], 201);
             });
 
