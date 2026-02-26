@@ -70,6 +70,11 @@ function PrescriptionComponent() {
     setSelectedPatient(patient);
 
     try {
+      if (!patient.id) {
+        console.error("Selected patient does not have an ID:", patient);
+        setPrescriptions([]);
+        return;
+      }
       const res = await fetch(
         `${apiUrl}/patient-prescription?patientId=${patient.id}`,
         {
@@ -120,7 +125,7 @@ function PrescriptionComponent() {
           <input
             type="text"
             placeholder="Search patients by name or phone..."
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-black"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

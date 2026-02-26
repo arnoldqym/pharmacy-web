@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Patient;
 use Illuminate\Http\JsonResponse;
+use Log;
 
 class PatientController extends Controller
 {
@@ -46,12 +47,12 @@ class PatientController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $query = $request->input('query');
-
+        $query = $request->input('q') ?? $request->input('query');
+        Log::info("ABout to check if : {$query} is in db");
         if (!$query || strlen($query) < 2) {
             return response()->json([]);
         }
-
+        Log::info("Searching for patients with query: {$query}");
         $patients = Patient::query()
             ->where('name', 'like', "%{$query}%")
             ->orWhere('phone', 'like', "%{$query}%")
