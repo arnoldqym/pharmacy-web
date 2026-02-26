@@ -187,9 +187,9 @@ class OrderController extends Controller
 
         $prescriptions = Order::query()
             ->with([
-                'patient:id,first_name,last_name', // Vital to know who the order is for
-                'items.drug:id,name',
-                'items.batch:id,batch_number'
+                'patient:id,name,phone', // Vital to know who the order is for
+                'items.drug:id,brand_name,generic_name', // Show drug details
+                'items.batch:id,batch_no,expiry_date'
             ])
             // 2. Optional Filtering (e.g., ?status=pending)
             ->when($request->status, function ($query, $status) {
