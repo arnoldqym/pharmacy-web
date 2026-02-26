@@ -103,8 +103,8 @@ export interface OrderItem {
   batch_id: number;
   quantity: number;
   batch_no: string | null;
-  unit_price: string | number;
-  subtotal: string | number;
+  unit_price: string;
+  subtotal: string;
   drug: Drug;
 }
 
@@ -112,7 +112,7 @@ export interface Order {
   id: number;
   order_number: string;
   status: "pending" | "completed" | "cancelled";
-  total_amount: string | number;
+  total_amount: string;
   notes?: string | null;
   created_at: string;
   updated_at: string;
