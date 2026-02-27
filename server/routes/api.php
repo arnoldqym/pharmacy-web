@@ -50,7 +50,7 @@ Route::middleware('auth:api')->group(function () {
     //Patient routes
     Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
     Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
-
+    Route::put('/patient-update/{patient}', [PatientController::class, 'updatePatientInformation'])->name('patients.update');
 
     //process orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
