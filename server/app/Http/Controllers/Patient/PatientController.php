@@ -3,44 +3,52 @@
 namespace App\Http\Controllers\Patient;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Patient;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Log;
 
 class PatientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Fetch All Patients
      */
-    public function index()
+
+    public function index(): JsonResponse
     {
-        //
+        $patients = Patient::paginate(30);
+        return response()->json($patients);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Update Patient Information
      */
-    public function create()
+    public function updatePatientInformation(Request $request, Patient $patient): JsonResponse
     {
-        //
+        // 1. Validation logic
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            // 2. Ignore the current patient's ID so it doesn't fail on their own email
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('patients')->ignore($patient->id)
+            ],
+            'date_of_birth' => 'required|date',
+        ]);
+
+        // 3. Update and Return
+        $patient->update($validatedData);
+
+        return response()->json([
+            'message' => 'Patient updated successfully',
+            'data' => $patient
+        ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
     /**
      * Search for existing patients.
@@ -60,29 +68,5 @@ class PatientController extends Controller
             ->get();
 
         return response()->json($patients);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

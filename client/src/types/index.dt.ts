@@ -136,5 +136,8 @@ export interface Patient {
   name: string;
   phone: string;
   email: string | null;
+  date_of_birth: string; // Dates are returned as strings in JSON
+  created_at: string;
+  updated_at: string;
   // ... other fields
 }
