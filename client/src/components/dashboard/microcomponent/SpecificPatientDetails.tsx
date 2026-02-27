@@ -1,43 +1,52 @@
 import React, { useState, useEffect } from "react";
 
-function SpecificPatientDetails({ patient, apiUrl, onUpdateSuccess }) {
+function SpecificPatientDetails({ patient, onUpdate }) {
+  const apiUrl = import.meta.env.VITE_BASE_API_URL;
+  const updateApi = `${apiUrl}/patient-update/${patient.id}`;
+
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
+    email: "",
     date_of_birth: "",
   });
-  const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const [originalData, setOriginalData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Populate form whenever the selected patient changes
+  // Initialize form when a new patient is selected
   useEffect(() => {
     if (patient) {
       setFormData({
         name: patient.name || "",
-        email: patient.email || "",
         phone: patient.phone || "",
+        email: patient.email || "",
         date_of_birth: patient.date_of_birth || "",
       });
-      setMessage({ type: "", text: "" }); // Clear old messages
+      setOriginalData(patient);
+      setError("");
+      setSuccess("");
     }
   }, [patient]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSaving(true);
-    setMessage({ type: "", text: "" });
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await fetch(`${apiUrl}/patient-update/${patient.id}`, {
+      const response = await fetch(updateApi, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify(formData),
@@ -45,120 +54,203 @@ function SpecificPatientDetails({ patient, apiUrl, onUpdateSuccess }) {
 
       const result = await response.json();
 
-      if (response.ok) {
-        setMessage({ type: "success", text: result.message });
-        // Send the updated data back to parent to refresh the sidebar
-        if (onUpdateSuccess) onUpdateSuccess(result.data);
-      } else {
-        // Handle Laravel validation errors
-        const errorText = result.message || "Failed to update patient.";
-        setMessage({ type: "error", text: errorText });
+      if (!response.ok) {
+        // Handle validation errors
+        const message = result.errors
+          ? Object.values(result.errors).flat().join(", ")
+          : result.message || "Update failed";
+        throw new Error(message);
       }
-    } catch (error) {
-      console.error("Update error:", error);
-      setMessage({ type: "error", text: "Network error. Please try again." });
+
+      // Success – pass updated patient to parent
+      onUpdate(result.data);
+      setSuccess("Patient information updated successfully!");
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setIsSaving(false);
+      setLoading(false);
     }
   };
 
+  const handleReset = () => {
+    if (originalData) {
+      setFormData({
+        name: originalData.name || "",
+        phone: originalData.phone || "",
+        email: originalData.email || "",
+        date_of_birth: originalData.date_of_birth || "",
+      });
+      setError("");
+      setSuccess("");
+    }
+  };
+
+  if (!patient) return null;
+
   return (
-    <div className="p-6 md:p-10 max-w-3xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="bg-blue-600 px-6 py-4">
-          <h3 className="text-xl font-bold text-white">Patient Record</h3>
-          <p className="text-blue-100 text-sm">
-            ID: {patient.id} • Added:{" "}
-            {new Date(patient.created_at).toLocaleDateString()}
-          </p>
+    <div className="patient-details">
+      <h2>Patient Information</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Full Name *</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {message.text && (
-            <div
-              className={`p-4 rounded-md ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
-            >
-              {message.text}
-            </div>
-          )}
+        <div className="form-group">
+          <label htmlFor="phone">Phone *</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+        <div className="form-group">
+          <label htmlFor="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-            {/* Phone Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+        <div className="form-group">
+          <label htmlFor="date_of_birth">Date of Birth *</label>
+          <input
+            type="date"
+            id="date_of_birth"
+            name="date_of_birth"
+            value={formData.date_of_birth}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-            {/* Email Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
-            {/* DOB Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date of Birth
-              </label>
-              <input
-                type="date"
-                name="date_of_birth"
-                value={formData.date_of_birth}
-                onChange={handleChange}
-                required
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+        <div className="form-actions">
+          <button type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save Changes"}
+          </button>
+          <button type="button" onClick={handleReset} disabled={loading}>
+            Reset
+          </button>
+        </div>
+      </form>
 
-          <div className="pt-4 border-t border-gray-100 flex justify-end">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className={`px-6 py-2.5 rounded-lg text-white font-medium shadow-sm transition-colors ${
-                isSaving
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-            >
-              {isSaving ? "Saving..." : "Update Details"}
-            </button>
-          </div>
-        </form>
+      <div className="audit-info">
+        <p>
+          <strong>Created:</strong>{" "}
+          {new Date(patient.created_at).toLocaleString()}
+        </p>
+        <p>
+          <strong>Last updated:</strong>{" "}
+          {new Date(patient.updated_at).toLocaleString()}
+        </p>
       </div>
+
+      <style>{`
+        .patient-details {
+          max-width: 500px;
+          margin: 0 auto;
+        }
+        .patient-details h2 {
+          margin-top: 0;
+          color: #1e2f4e;
+          border-bottom: 2px solid #e0e0e0;
+          padding-bottom: 0.5rem;
+        }
+        .form-group {
+          margin-bottom: 1.2rem;
+        }
+        .form-group label {
+          display: block;
+          margin-bottom: 0.3rem;
+          font-weight: 500;
+          color: #2e405b;
+        }
+        .form-group input {
+          width: 100%;
+          padding: 0.6rem;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          font-size: 1rem;
+          transition: border 0.2s;
+        }
+        .form-group input:focus {
+          border-color: #2c7da0;
+          outline: none;
+        }
+        .form-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+        .form-actions button {
+          padding: 0.6rem 1.5rem;
+          border: none;
+          border-radius: 6px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .form-actions button[type="submit"] {
+          background: #2c7da0;
+          color: white;
+        }
+        .form-actions button[type="submit"]:hover:not(:disabled) {
+          background: #1e5f7a;
+        }
+        .form-actions button[type="button"] {
+          background: #e0e0e0;
+          color: #1e2f4e;
+        }
+        .form-actions button[type="button"]:hover:not(:disabled) {
+          background: #c0c0c0;
+        }
+        .form-actions button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        .error-message {
+          color: #b22222;
+          background: #ffe5e5;
+          padding: 0.6rem;
+          border-radius: 4px;
+          margin: 1rem 0;
+        }
+        .success-message {
+          color: #2e7d32;
+          background: #e8f5e9;
+          padding: 0.6rem;
+          border-radius: 4px;
+          margin: 1rem 0;
+        }
+        .audit-info {
+          margin-top: 2rem;
+          padding-top: 1rem;
+          border-top: 1px dashed #ccc;
+          font-size: 0.9rem;
+          color: #5f6b7a;
+        }
+        .audit-info p {
+          margin: 0.2rem 0;
+        }
+      `}</style>
     </div>
   );
 }

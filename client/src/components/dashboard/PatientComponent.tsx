@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import SpecificPatientDetails from "./microcomponent/SpecificPatientDetails"; // Adjust path if needed
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import SpecificPatientDetails from "./microcomponent/SpecificPatientDetails";
 
 function PatientComponent() {
   const apiUrl = import.meta.env.VITE_BASE_API_URL;
@@ -11,142 +11,266 @@ function PatientComponent() {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   // Fetch all patients on mount
   useEffect(() => {
+    const fetchAllPatients = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(fetchAllPatientsApi, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+          },
+        });
+        const data = await response.json();
+        // API returns paginated data with a 'data' field containing the patient array
+        setPatients(data.data || []);
+      } catch (err) {
+        console.error("Error fetching patients:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchAllPatients();
-  }, []);
+  }, [fetchAllPatientsApi]);
 
-  // Debounced Search Effect
+  // Debounced search
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchQuery.length >= 2) {
-        searchPatients();
+    const handler = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        performSearch();
       } else {
         setSearchResults([]);
       }
-    }, 500); // Wait 500ms after user stops typing
+    }, 300);
 
-    return () => clearTimeout(delayDebounceFn);
+    return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  const fetchAllPatients = async () => {
-    setLoading(true);
+  const performSearch = async () => {
+    setSearchLoading(true);
     try {
-      const response = await fetch(fetchAllPatientsApi, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          Accept: "application/json",
+      const response = await fetch(
+        `${searchPatientsApi}?q=${encodeURIComponent(searchQuery)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+          },
         },
-      });
+      );
       const data = await response.json();
-      setPatients(data.data); // Laravel pagination wraps data inside 'data'
-    } catch (err) {
-      console.error("Error fetching patients:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const searchPatients = async () => {
-    try {
-      const res = await fetch(`${searchPatientsApi}?q=${searchQuery}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          Accept: "application/json",
-        },
-      });
-      const data = await res.json();
-      setSearchResults(data); // Search controller returns array directly
+      setSearchResults(data); // search returns array directly
     } catch (err) {
       console.error("Search error:", err);
+    } finally {
+      setSearchLoading(false);
     }
   };
 
-  // Determine which list to show
-  const displayList = searchQuery.length >= 2 ? searchResults : patients;
+  const handlePatientClick = (patient) => {
+    setSelectedPatient(patient);
+  };
 
-  // Callback to update the local list after a successful edit without refreshing the whole page
-  const handlePatientUpdated = (updatedPatient) => {
-    setPatients(
-      patients.map((p) => (p.id === updatedPatient.id ? updatedPatient : p)),
+  // After a successful update, refresh the patient in the list and keep selection
+  const handlePatientUpdate = (updatedPatient) => {
+    // Update in patients list
+    setPatients((prev) =>
+      prev.map((p) => (p.id === updatedPatient.id ? updatedPatient : p)),
     );
+    // Update in search results if present
+    setSearchResults((prev) =>
+      prev.map((p) => (p.id === updatedPatient.id ? updatedPatient : p)),
+    );
+    // Update selected patient
     setSelectedPatient(updatedPatient);
   };
 
+  // Determine which list to display
+  const displayedPatients = useMemo(() => {
+    if (searchQuery.trim().length >= 2) return searchResults;
+    return patients;
+  }, [patients, searchResults, searchQuery]);
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
-      {/* Sidebar / Patient List */}
-      <div className="w-full md:w-1/3 bg-white border-r border-gray-200 flex flex-col h-1/2 md:h-full">
-        <div className="p-4 border-b border-gray-200 bg-white sticky top-0">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Patients</h2>
+    <div className="patient-dashboard">
+      <div className="patient-list-panel">
+        <h2>Patients</h2>
+        <div className="search-box">
           <input
             type="text"
             placeholder="Search by name or phone..."
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {searchLoading && <span className="spinner" />}
         </div>
-
-        <div className="overflow-y-auto flex-1 p-2">
-          {loading && (
-            <p className="p-4 text-gray-500 text-center">Loading patients...</p>
+        <div className="patient-list">
+          {loading && <div className="loading">Loading patients...</div>}
+          {!loading && displayedPatients.length === 0 && (
+            <div className="no-results">No patients found</div>
           )}
-          {!loading && displayList.length === 0 && (
-            <p className="p-4 text-gray-500 text-center">No patients found.</p>
-          )}
-
-          <ul className="space-y-1">
-            {displayList.map((patient) => (
-              <li key={patient.id}>
-                <button
-                  onClick={() => setSelectedPatient(patient)}
-                  className={`w-full text-left p-4 rounded-lg transition-colors ${
-                    selectedPatient?.id === patient.id
-                      ? "bg-blue-50 border-blue-500 border-l-4"
-                      : "hover:bg-gray-100 border-transparent border-l-4"
-                  }`}
-                >
-                  <div className="font-semibold text-gray-800">
-                    {patient.name}
-                  </div>
-                  <div className="text-sm text-gray-500">{patient.phone}</div>
-                </button>
-              </li>
-            ))}
-          </ul>
+          {displayedPatients.map((patient) => (
+            <div
+              key={patient.id}
+              className={`patient-item ${
+                selectedPatient?.id === patient.id ? "selected" : ""
+              }`}
+              onClick={() => handlePatientClick(patient)}
+            >
+              <div className="patient-name">{patient.name}</div>
+              <div className="patient-phone">{patient.phone}</div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Main Content / Patient Details */}
-      <div className="w-full md:w-2/3 h-1/2 md:h-full overflow-y-auto bg-gray-50">
+      <div className="patient-detail-panel">
         {selectedPatient ? (
           <SpecificPatientDetails
             patient={selectedPatient}
-            apiUrl={apiUrl}
-            onUpdateSuccess={handlePatientUpdated}
+            onUpdate={handlePatientUpdate}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400 flex-col">
-            <svg
-              className="w-16 h-16 mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              ></path>
-            </svg>
-            <p className="text-xl">Select a patient to view or edit details</p>
+          <div className="placeholder">
+            Select a patient to view / edit details
           </div>
         )}
       </div>
+
+      <style>{`
+        .patient-dashboard {
+          display: flex;
+          flex-direction: row;
+          height: 100%;
+          min-height: 80vh;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          overflow: hidden;
+          font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .patient-list-panel {
+          width: 30%;
+          background: #f9fafc;
+          border-right: 1px solid #e0e0e0;
+          display: flex;
+          flex-direction: column;
+          padding: 1rem;
+        }
+
+        .patient-detail-panel {
+          width: 70%;
+          background: white;
+          padding: 1.5rem;
+          overflow-y: auto;
+        }
+
+        .search-box {
+          margin: 1rem 0;
+          position: relative;
+        }
+
+        .search-box input {
+          width: 100%;
+          padding: 0.6rem 2rem 0.6rem 0.8rem;
+          border: 1px solid #ccc;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          outline: none;
+          transition: border 0.2s;
+        }
+
+        .search-box input:focus {
+          border-color: #2c7da0;
+        }
+
+        .spinner {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 16px;
+          height: 16px;
+          border: 2px solid #ccc;
+          border-top-color: #2c7da0;
+          border-radius: 50%;
+          animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        .patient-list {
+          flex: 1;
+          overflow-y: auto;
+        }
+
+        .patient-item {
+          padding: 0.8rem;
+          margin-bottom: 0.4rem;
+          background: white;
+          border-radius: 8px;
+          cursor: pointer;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          transition: background 0.2s, box-shadow 0.2s;
+        }
+
+        .patient-item:hover {
+          background: #eef6fb;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .patient-item.selected {
+          background: #d4e6f1;
+          border-left: 4px solid #2c7da0;
+        }
+
+        .patient-name {
+          font-weight: 600;
+          color: #1e2f4e;
+        }
+
+        .patient-phone {
+          font-size: 0.85rem;
+          color: #5f6b7a;
+          margin-top: 0.2rem;
+        }
+
+        .placeholder {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          color: #8a9aa8;
+          font-style: italic;
+        }
+
+        .loading, .no-results {
+          text-align: center;
+          color: #5f6b7a;
+          padding: 2rem 0;
+        }
+
+        /* Responsive: stack on small screens */
+        @media (max-width: 768px) {
+          .patient-dashboard {
+            flex-direction: column;
+          }
+          .patient-list-panel,
+          .patient-detail-panel {
+            width: 100%;
+            border-right: none;
+          }
+          .patient-list-panel {
+            border-bottom: 1px solid #e0e0e0;
+            max-height: 300px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
