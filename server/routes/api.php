@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Inventory\InventoryController;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\Overview\OverviewController;
+use App\Http\Controllers\Patient\PatientController;
 use App\Http\Controllers\Upload\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    //update current stock
     Route::post('/upload-csv', [UploadController::class, 'uploadCSV'])->name('upload.csv');
     Route::post('/upload-single-drug', [UploadController::class, 'uploadSingleDrug'])->name('upload.single.drug');
 
@@ -41,7 +43,17 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('/overview', [OverviewController::class, 'index'])->name('overview.index');
 
+    //prescriptions fetch
+    Route::get('/all-prescriptions', [OrderController::class, 'fetchAllPrescriptions'])->name('orders.all.prescriptions');
+    Route::get('/patient-prescription', [OrderController::class, 'fetchPrescriptionsForSpecificPatient'])->name('orders.patient.prescription');
+
+    //Patient routes
+    Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+    Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+    Route::put('/patient-update/{patient}', [PatientController::class, 'updatePatientInformation'])->name('patients.update');
+
     //process orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/specific-drug', [OrderController::class, 'fetchSpecificDrug'])->name('orders.specific.drug');
 });

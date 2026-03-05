@@ -95,3 +95,49 @@ export interface InventoryResponse {
   success: boolean;
   data: Drug[];
 }
+
+//interface for order item
+export interface OrderItem {
+  id: number;
+  drug_id: number;
+  batch_id: number;
+  quantity: number;
+  batch_no: string | null;
+  unit_price: string;
+  subtotal: string;
+  drug: Drug;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  status: "pending" | "completed" | "cancelled";
+  total_amount: string;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  patient_id: number;
+  patient: Patient;
+  items?: OrderItem[];
+}
+
+export interface CreateOrderPayload {
+  items: Array<{
+    drug_id: number;
+    batch_no: number | string;
+    quantity: number;
+  }>;
+  notes?: string;
+}
+
+//patient interface
+export interface Patient {
+  id: number;
+  name: string;
+  phone: string;
+  email: string | null;
+  date_of_birth: string; // Dates are returned as strings in JSON
+  created_at: string;
+  updated_at: string;
+  // ... other fields
+}
